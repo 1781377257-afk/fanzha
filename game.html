@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>骗局闯关 · 反诈小安</title>
+<style>
+  :root{
+    --bg:#070d16; --panel:#111c2e; --panel2:#0d1626;
+    --line:rgba(255,255,255,.09); --txt:#e8eefc; --sub:#8ea3c2;
+    --brand:#37b6ff; --bad:#ff5b5b; --ok:#2fd39a; --warn:#ffbf47;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(900px 500px at 50% -8%, #12305a 0%, transparent 62%),
+      radial-gradient(700px 400px at 50% 108%, #2a1030 0%, transparent 60%),
+      linear-gradient(180deg,#070d16,#05090f 70%);
+    color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  .wrap{max-width:440px;margin:0 auto;padding:18px 16px 34px;min-height:100vh;display:flex;flex-direction:column}
+
+  /* ---------- 通用 ---------- */
+  .hide{display:none!important}
+  .fade{animation:fade .45s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .shake{animation:shake .42s}
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    15%{transform:translateX(-9px)}30%{transform:translateX(8px)}
+    45%{transform:translateX(-6px)}60%{transform:translateX(5px)}80%{transform:translateX(-2px)}
+  }
+
+  /* ---------- 开场 ---------- */
+  .intro{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding-bottom:30px}
+  .badge{
+    display:inline-block;align-self:center;font-size:11px;letter-spacing:3px;color:#7fa6d4;
+    border:1px solid rgba(120,180,255,.22);padding:5px 12px;border-radius:999px;margin-bottom:20px;
+  }
+  .intro h1{font-size:29px;font-weight:800;letter-spacing:2px;line-height:1.35}
+  .intro h1 em{font-style:normal;color:var(--bad)}
+  .intro p{margin-top:14px;font-size:13.5px;line-height:1.9;color:var(--sub)}
+  .intro .tip{margin-top:26px;font-size:11.5px;color:#5d7392;line-height:1.9}
+
+  .btn{
+    display:block;width:100%;border:none;border-radius:14px;padding:16px;cursor:pointer;
+    font-family:inherit;font-size:15.5px;font-weight:700;letter-spacing:1px;
+    background:linear-gradient(140deg,#37b6ff,#1a6fd4);color:#fff;
+    box-shadow:0 12px 30px rgba(55,182,255,.26);transition:transform .15s;
+  }
+  .btn:active{transform:scale(.975)}
+  .btn.ghost{background:rgba(255,255,255,.06);color:#b9cbe6;box-shadow:none;border:1px solid var(--line)}
+  .btn.mt{margin-top:14px}
+
+  /* ---------- 顶部状态 ---------- */
+  .hud{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .lv{font-size:12px;color:var(--sub);letter-spacing:1.5px;white-space:nowrap}
+  .bar{flex:1;height:8px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}
+  .bar>i{
+    display:block;height:100%;width:100%;border-radius:5px;
+    background:linear-gradient(90deg,#2fd39a,#37b6ff);
+    transition:width .6s cubic-bezier(.2,.8,.2,1), background .4s;
+  }
+  .bar.low>i{background:linear-gradient(90deg,#ffbf47,#ff7a45)}
+  .bar.dead>i{background:linear-gradient(90deg,#ff5b5b,#c0261f)}
+  .hpnum{font-size:12.5px;font-weight:700;color:#cfdcf4;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+  /* ---------- 场景卡 ---------- */
+  .scene{
+    background:linear-gradient(180deg,rgba(20,34,54,.92),rgba(12,22,36,.95));
+    border:1px solid var(--line);border-radius:18px;padding:18px 17px;
+    box-shadow:0 18px 40px rgba(0,0,0,.45);
+  }
+  .scene .ch{font-size:11px;letter-spacing:2px;color:#6f8bb0;margin-bottom:11px}
+  .chat{display:flex;gap:10px;margin-bottom:11px}
+  .chat .who{
+    width:32px;height:32px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center;
+    font-size:13px;background:linear-gradient(150deg,#22405f,#16263c);color:#9fc4e8;
+  }
+  .chat .bubble{
+    flex:1;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.06);
+    border-radius:12px 12px 12px 4px;padding:11px 13px;font-size:13.5px;line-height:1.8;color:#dbe7fa;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .chat .bubble .mono{
+    display:block;margin-top:9px;padding:10px;border-radius:9px;
+    background:rgba(0,0,0,.32);border:1px dashed rgba(255,255,255,.14);
+    font-size:12px;color:#93a7c4;letter-spacing:.5px;text-align:center;
+  }
+  .ask{font-size:13px;color:#9fb3d0;margin:16px 0 11px;letter-spacing:.5px}
+
+  /* ---------- 选项 ---------- */
+  .opts{display:grid;gap:10px}
+  .opt{
+    display:flex;gap:11px;align-items:flex-start;text-align:left;width:100%;
+    background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:13px;
+    padding:14px 14px;cursor:pointer;color:var(--txt);font-family:inherit;
+    font-size:13.5px;line-height:1.7;transition:.18s;
+  }
+  .opt:active{transform:scale(.985);background:rgba(255,255,255,.075)}
+  .opt .k{
+    width:20px;height:20px;border-radius:6px;flex:0 0 auto;display:grid;place-items:center;
+    background:rgba(55,182,255,.16);color:#7cc6ff;font-size:11px;font-weight:700;margin-top:1px;
+  }
+  .opt.right{border-color:rgba(47,211,154,.55);background:rgba(47,211,154,.10)}
+  .opt.wrong{border-color:rgba(255,91,91,.55);background:rgba(255,91,91,.10)}
+  .opt.dim{opacity:.45}
+
+  /* ---------- 结果 ---------- */
+  .result{margin-top:16px;border-radius:16px;padding:16px 16px 14px;border:1px solid var(--line);
+          background:rgba(255,255,255,.04);animation:fade .4s cubic-bezier(.2,.8,.2,1) both}
+  .result.bad{border-color:rgba(255,91,91,.4);background:rgba(255,91,91,.08)}
+  .result.good{border-color:rgba(47,211,154,.4);background:rgba(47,211,154,.08)}
+  .result h3{font-size:15px;font-weight:800;letter-spacing:.5px;margin-bottom:8px}
+  .result.bad h3{color:#ff9a9a}
+  .result.good h3{color:#7fe3c2}
+  .result p{font-size:12.5px;line-height:1.9;color:#c9d8ee}
+  .result .delta{float:right;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+  .result.bad .delta{color:var(--bad)}
+  .result.good .delta{color:var(--ok)}
+
+  /* ---------- 结算 ---------- */
+  .sum{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center}
+  .sum .t1{font-size:12px;letter-spacing:3px;color:#6f8bb0}
+  .sum .big{font-size:44px;font-weight:800;letter-spacing:-1px;margin:12px 0 2px;line-height:1.1}
+  .sum .big small{font-size:17px;font-weight:600;margin-left:4px;color:var(--sub)}
+  .sum .grade{display:inline-block;align-self:center;margin:12px 0 4px;padding:6px 16px;border-radius:999px;
+              font-size:12.5px;font-weight:700;letter-spacing:1px}
+  .sum .desc{font-size:13px;line-height:1.95;color:var(--sub);margin-top:14px;padding:0 6px}
+  .sum .rows{margin-top:22px;border-top:1px solid var(--line);padding-top:16px;text-align:left}
+  .sum .row{display:flex;justify-content:space-between;font-size:12.5px;color:#a9bcd6;padding:7px 2px}
+  .sum .row b{color:#dfeafc;font-variant-numeric:tabular-nums}
+
+  .foot{text-align:center;font-size:10.5px;color:#42566f;letter-spacing:1.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ========== 开场 ========== -->
+  <div class="intro" id="intro">
+    <div class="badge">反 诈 小 安 · 情 景 闯 关</div>
+    <h1>你能撑到<em>第几关</em>？</h1>
+    <p>五关，每条消息都可能是陷阱。<br>选错一次，血就掉一截。</p>
+    <div style="margin-top:34px">
+      <button class="btn" id="start">开 始 闯 关</button>
+    </div>
+    <div class="tip">生命值 100 · 归零即出局<br>以下情景均改编自真实骗术</div>
+  </div>
+
+  <!-- ========== 游戏 ========== -->
+  <div id="game" class="hide">
+    <div class="hud">
+      <div class="lv" id="lv">第 1 关 / 5</div>
+      <div class="bar" id="bar"><i id="barFill"></i></div>
+      <div class="hpnum" id="hp">100</div>
+    </div>
+    <div id="stage"></div>
+  </div>
+
+  <!-- ========== 结算 ========== -->
+  <div class="sum hide" id="sum">
+    <div class="t1">结 算</div>
+    <div class="big" id="savedNum">0<small>元</small></div>
+    <div class="desc" style="margin-top:2px">这一局，你替自己守住的</div>
+    <div class="grade" id="grade">—</div>
+    <div class="desc" id="gradeDesc">—</div>
+    <div class="rows" id="rows"></div>
+    <div style="margin-top:26px">
+      <button class="btn" id="toAgent">让 AI 陪我练一次真对话</button>
+      <button class="btn ghost mt" id="again">再闯一次</button>
+    </div>
+    <div class="foot">反诈小安 · 校园反诈服务台</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var AGENT = 'https://robot.chaoxing.com/prime?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae';
+
+  /* ---------------- 关卡数据 ---------------- */
+  var LEVELS = [
+    {
+      ch:'群里弹出一条消息',
+      who:'学',
+      bubble:'@全体成员 学校订教辅资料，每人 198，今天下午 5 点前交齐，扫码备注学号。',
+      extra:'[ 收款码 · 个人微信 ]',
+      ask:'你怎么办？',
+      opts:[
+        {t:'直接扫码交了，反正是群里的通知', hp:-35, money:198,
+         r:'钱转出去了。半小时后真正的辅导员在群里说：没人通知收费，那个号是被盗的。',
+         g:'群里的通知不等于学校的通知。个人收款码 = 直接停。'},
+        {t:'回一句"我先问下班长"，然后把截图发群里', hp:+8, money:0,
+         r:'班长说没这回事。你顺手提醒了全群，帮十几个人挡住了。',
+         g:'对。有疑问就地验证，是最快的止损。'},
+        {t:'先不回，去学校官网或教务系统查有没有这个通知', hp:+10, money:0,
+         r:'官网什么都没有。你把收款码举报了。',
+         g:'最稳的做法：只信官方渠道。'}
+      ]
+    },
+    {
+      ch:'QQ 跳出一个好友申请',
+      who:'兼',
+      bubble:'同学你好，招线上兼职，动动手指日赚 300。\n先做一单试试，本金马上返，秒到账。',
+      extra:'[ 已返现 20 元 ]',
+      ask:'第一单真给你返了 20 块。这时候？',
+      opts:[
+        {t:'真的返了！那就接着做，下一单要垫 300', hp:-42, money:299,
+         r:'300 垫进去后，客服说"任务未完成不能提现"，要再垫 2000 才能一起返。你停了，亏 300。',
+         g:'先给你甜头，是最标准的钩子。第一单真返现，就是为了让你垫第二单。'},
+        {t:'垫了 300，对方说再做一单 2000 才能一起提', hp:-58, money:2299,
+         r:'你垫到 2000 的时候，对方把你删了。群里那些"已提现"的截图，全是托。',
+         g:'沉没成本是最贵的。垫进去的钱，是拿不回来的诱饵。'},
+        {t:'不做了。真兼职不会让你先垫钱', hp:+10, money:0,
+         r:'你退出了。那个"返现 20"是诱饵，20 块买你的信任，很便宜。',
+         g:'记住这条：凡是要你先垫钱的兼职，100% 是骗。'}
+      ]
+    },
+    {
+      ch:'一个电话打进来',
+      who:'服',
+      bubble:'您好，我是 XX 快递客服。您的包裹在运输中丢失了，\n我们按三倍赔付，一共 288 元。加个微信给您办理。',
+      extra:'[ 对方能准确报出你的快递单号 ]',
+      ask:'对方连单号都说对了。你怎么做？',
+      opts:[
+        {t:'加微信，按他说的办', hp:-30, money:0,
+         r:'加了微信后，他要你"下载理赔 App"并"共享屏幕核对信息"。你警觉了，只损失了时间。',
+         g:'退货赔款永远原路退回，不需要加私人微信。'},
+        {t:'下载他发的 App，开屏幕共享让他帮我操作', hp:-55, money:8000,
+         r:'屏幕共享的十分钟里，他看到了你的支付密码和短信验证码。卡里 8000 被转走。',
+         g:'共享屏幕 = 把手机交给他。任何要求共享屏幕的"客服"，都是骗子。'},
+        {t:'挂断，自己去官方 App 查订单状态', hp:+10, money:0,
+         r:'订单显示正常运输中。刚才那个电话，是拿泄露的物流信息做的局。',
+         g:'单号对不代表人是对的——信息早被卖过好几轮了。'}
+      ]
+    },
+    {
+      ch:'学长的私聊',
+      who:'学',
+      bubble:'学弟，我这边有个家教的活，一小时 200，\n你先交 300 服装费，上完第一节课退给你。',
+      extra:'[ 对方发来一张"工作证" ]',
+      ask:'一小时 200，听起来不错。你怎么回？',
+      opts:[
+        {t:'交了 300，机会难得', hp:-35, money:300,
+         r:'交完钱，对方说要排队等家长，一周后再问，已经被拉黑。',
+         g:'正规兼职从不提前收费。服装费、押金、信息费，都是同一套。'},
+        {t:'可以，但我想先线上试讲一次，讲完再谈费用', hp:+12, money:0,
+         r:'对方开始支支吾吾，说"试讲要收费"。你没再理他。',
+         g:'最好的试探是：要求对方先付出成本。真雇主不怕试讲。'},
+        {t:'行，不过要签个简单的劳务协议', hp:+10, money:0,
+         r:'对方立刻说"太麻烦，算了"。你躲过一次。',
+         g:'敢走正式流程的人，才可能是真的。'}
+      ]
+    },
+    {
+      ch:'游戏好友的私聊',
+      who:'友',
+      bubble:'兄弟帮我个忙，你收个款，别人微信限额了转不进来。\n你用收款码收一下，转给我，我给你 1000 辛苦费。',
+      extra:'[ 对方是你打游戏认识一年的网友 ]',
+      ask:'只是帮忙收个钱，还给 1000。你怎么做？',
+      opts:[
+        {t:'帮个忙，把收款码发过去', hp:-62, money:3000,
+         r:'三天后，你的卡被冻结，学校通知你去派出所说明情况。你收到的那笔钱是诈骗赃款，你的卡成了"涉案卡"。',
+         g:'这不是帮忙，这是"跑分"。可能构成帮助信息网络犯罪活动罪，最高三年。'},
+        {t:'不借。我的卡和收款码不外借', hp:+15, money:0,
+         r:'你拒绝了。对方立马翻脸骂你不够意思——真正需要帮忙的人不会这样。',
+         g:'对的。任何"用你的卡过一下账还给钱"的请求，都是让你当替罪羊。'},
+        {t:'问他这钱是哪来的，说不清就不借', hp:+6, money:0,
+         r:'对方含糊其辞，说"你别管那么多"。你把对话截图存了下来，没有借。',
+         g:'问来源是对的，但更安全的做法是直接拒绝——你没法核实他说的真假。'}
+      ]
+    }
+  ];
+
+  var MAX_LOSS = LEVELS.reduce(function(s, l){
+    return s + Math.max.apply(null, l.opts.map(function(o){ return o.money || 0; }));
+  }, 0);
+
+  var idx = 0, hp = 100, lost = 0, log = [];
+  var barFill = document.getElementById('barFill'), bar = document.getElementById('bar');
+  var hpEl = document.getElementById('hp'), lvEl = document.getElementById('lv');
+  var stage = document.getElementById('stage');
+
+  /* ---------------- 音效（WebAudio，无外部资源） ---------------- */
+  var AC = null;
+  function beep(freq, dur, type, gain){
+    try{
+      if(!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+      var o = AC.createOscillator(), g = AC.createGain();
+      o.type = type || 'sine';
+      o.frequency.value = freq;
+      g.gain.value = gain || 0.05;
+      o.connect(g); g.connect(AC.destination);
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + (dur||0.18));
+      o.stop(AC.currentTime + (dur||0.18));
+    }catch(e){}
+  }
+
+  function renderHUD(){
+    var pct = Math.max(0, hp);
+    barFill.style.width = pct + '%';
+    hpEl.textContent = pct;
+    bar.className = 'bar' + (pct <= 30 ? ' dead' : (pct <= 60 ? ' low' : ''));
+    lvEl.textContent = '第 ' + Math.min(idx + 1, LEVELS.length) + ' 关 / ' + LEVELS.length;
+  }
+
+  function renderLevel(){
+    var L = LEVELS[idx];
+    renderHUD();
+    var keys = ['A','B','C','D'];
+    var html = '';
+    html += '<div class="scene fade">';
+    html +=   '<div class="ch">' + L.ch + '</div>';
+    html +=   '<div class="chat"><div class="who">' + L.who + '</div><div class="bubble">' + L.bubble.replace(/\n/g,'<br>');
+    if(L.extra) html += '<span class="mono">' + L.extra + '</span>';
+    html +=   '</div></div>';
+    html += '</div>';
+    html += '<div class="ask">' + L.ask + '</div>';
+    html += '<div class="opts">';
+    L.opts.forEach(function(o, i){
+      html += '<button class="opt" data-i="' + i + '"><span class="k">' + keys[i] + '</span><span>' + o.t + '</span></button>';
+    });
+    html += '</div>';
+    html += '<div id="resSlot"></div>';
+    stage.innerHTML = html;
+
+    Array.prototype.forEach.call(stage.querySelectorAll('.opt'), function(btn){
+      btn.addEventListener('click', function(){ choose(parseInt(btn.dataset.i, 10)); });
+    });
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function choose(i){
+    var L = LEVELS[idx], o = L.opts[i];
+    var bad = (o.hp < 0);
+
+    // 锁定选项
+    var btns = stage.querySelectorAll('.opt');
+    Array.prototype.forEach.call(btns, function(b, j){
+      b.disabled = true;
+      if(j === i) b.classList.add(bad ? 'wrong' : 'right');
+      else b.classList.add('dim');
+    });
+
+    // 扣血
+    hp = Math.max(0, hp + o.hp);
+    if(o.money) lost += o.money;
+    log.push({ lv: idx + 1, bad: bad, money: o.money || 0 });
+
+    if(bad){ beep(150, .22, 'sawtooth', .06); stage.querySelector('.scene').classList.add('shake'); }
+    else { beep(660, .12, 'sine', .05); setTimeout(function(){ beep(880, .16, 'sine', .045); }, 110); }
+
+    // 结果
+    var slot = document.getElementById('resSlot');
+    slot.innerHTML =
+      '<div class="result ' + (bad ? 'bad' : 'good') + '">' +
+        '<span class="delta">' + (o.hp > 0 ? '+' : '') + o.hp + ' 血</span>' +
+        '<h3>' + (bad ? '你被骗了' : '这一步走对了') + '</h3>' +
+        '<p>' + o.r + '</p>' +
+        '<p style="margin-top:9px;color:#9fb3d0">' + o.g + '</p>' +
+      '</div>' +
+      '<button class="btn mt" id="next">' + (idx >= LEVELS.length - 1 ? '看 结 算' : '下 一 关') + '</button>';
+
+    renderHUD();
+    document.getElementById('next').addEventListener('click', function(){
+      if(hp <= 0 || idx >= LEVELS.length - 1){ finish(); }
+      else { idx++; renderLevel(); }
+    });
+    document.getElementById('next').scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  function finish(){
+    document.getElementById('game').classList.add('hide');
+    var sum = document.getElementById('sum');
+    sum.classList.remove('hide');
+    sum.classList.add('fade');
+
+    var saved = Math.max(0, MAX_LOSS - lost);
+    var n = 0;
+    var el = document.getElementById('savedNum');
+    var timer = setInterval(function(){
+      n += Math.max(1, Math.round(saved / 28));
+      if(n >= saved){ n = saved; clearInterval(timer); }
+      el.innerHTML = n.toLocaleString('zh-CN') + '<small>元</small>';
+    }, 32);
+
+    var g, gd, col;
+    if(hp >= 90)      { g='防骗体质 · 满格'; gd='五关下来几乎没踩坑。你比大多数人都稳。'; col='#2fd39a'; }
+    else if(hp >= 70) { g='基本能扛';       gd='踩过一点坑，但都及时收住了。'; col='#37b6ff'; }
+    else if(hp >= 45) { g='差点栽了';       gd='有一两次差点把持不住——骗子最擅长的就是这个。'; col='#ffbf47'; }
+    else              { g='高危体质';       gd='这一局你损失得很重。真实情况下，一次就够了。'; col='#ff5b5b'; }
+
+    var grade = document.getElementById('grade');
+    grade.textContent = g;
+    grade.style.color = col;
+    grade.style.background = col + '1f';
+    grade.style.border = '1px solid ' + col + '66';
+
+    document.getElementById('gradeDesc').textContent = gd;
+
+    var rows = '<div class="row"><span>这一局的潜在损失</span><b>' + MAX_LOSS.toLocaleString('zh-CN') + ' 元</b></div>';
+    rows += '<div class="row"><span>你实际被骗走</span><b style="color:#ff8b8b">' + lost.toLocaleString('zh-CN') + ' 元</b></div>';
+    rows += '<div class="row"><span>剩余生命值</span><b>' + hp + ' / 100</b></div>';
+    rows += '<div class="row"><span>一次选对就躲过的损失</span><b style="color:#7fe3c2">' + saved.toLocaleString('zh-CN') + ' 元</b></div>';
+    document.getElementById('rows').innerHTML = rows;
+
+    if(hp >= 70) { beep(660,.14,'sine',.05); setTimeout(function(){beep(880,.2,'sine',.05);},120); }
+    else { beep(200,.3,'sawtooth',.05); }
+
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  document.getElementById('start').addEventListener('click', function(){
+    document.getElementById('intro').classList.add('hide');
+    document.getElementById('game').classList.remove('hide');
+    document.getElementById('game').classList.add('fade');
+    beep(520,.1,'sine',.04);
+    renderLevel();
+  });
+
+  document.getElementById('toAgent').addEventListener('click', function(){ location.href = AGENT; });
+
+  document.getElementById('again').addEventListener('click', function(){
+    idx = 0; hp = 100; lost = 0; log = [];
+    document.getElementById('sum').classList.add('hide');
+    document.getElementById('game').classList.remove('hide');
+    renderLevel();
+  });
+})();
+</script>
+</body>
+</html>
