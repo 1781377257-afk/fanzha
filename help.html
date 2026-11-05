@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>本校反诈求助卡 | 反诈小安</title>
+<style>
+  :root{
+    --bg1:#0b1220; --bg2:#111c33; --card:rgba(255,255,255,.045);
+    --line:rgba(255,255,255,.10); --txt:#e8eefc; --sub:#93a4c3;
+    --brand:#37b6ff; --urgent:#ff6b6b; --ok:#2fd39a; --warn:#ffbf47;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #17325e 0%, transparent 60%),
+      linear-gradient(165deg,var(--bg1),var(--bg2) 55%,#0a1018);
+    color:var(--txt);min-height:100vh;padding:22px 16px 44px;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:430px;margin:0 auto}
+
+  .head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .logo{
+    width:38px;height:38px;border-radius:12px;flex:0 0 auto;
+    background:linear-gradient(140deg,#ff6b6b,#c0261f);
+    display:grid;place-items:center;font-size:19px;font-weight:700;
+    box-shadow:0 8px 22px rgba(255,107,107,.26);
+  }
+  .head h1{font-size:15.5px;font-weight:600;letter-spacing:.2px}
+  .head p{font-size:11.5px;color:var(--sub);margin-top:2px;letter-spacing:.3px}
+
+  .tip{
+    margin:14px 0 16px;padding:11px 13px;border-radius:12px;font-size:12px;line-height:1.7;
+    background:rgba(255,107,107,.09);border:1px solid rgba(255,107,107,.22);color:#ffd7d7;
+  }
+
+  /* 校区切换 */
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tab{
+    flex:1;padding:11px;border-radius:12px;text-align:center;font-size:13px;font-weight:600;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--sub);
+    cursor:pointer;transition:.2s;user-select:none;
+  }
+  .tab.on{background:linear-gradient(140deg,#37b6ff,#1a6fd4);border-color:transparent;color:#fff;
+          box-shadow:0 8px 20px rgba(55,182,255,.24)}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:16px 15px;margin-bottom:12px;backdrop-filter:blur(12px);
+  }
+  .card.urgent{border-color:rgba(255,107,107,.28);background:rgba(255,107,107,.06)}
+  .card.soft{border-color:rgba(55,182,255,.20);background:rgba(55,182,255,.05)}
+
+  .row{display:flex;align-items:flex-start;gap:12px}
+  .ico{
+    width:38px;height:38px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
+    background:rgba(255,255,255,.06);font-size:17px;
+  }
+  .info{flex:1;min-width:0}
+  .info .lab{font-size:11px;color:var(--sub);letter-spacing:.6px;margin-bottom:3px}
+  .info .name{font-size:14.5px;font-weight:600;margin-bottom:4px}
+  .info .addr{font-size:12px;color:var(--sub);line-height:1.6}
+  .info .addr b{color:#cfdcf4;font-weight:500}
+
+  .call{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    margin-top:12px;padding:12px;border-radius:12px;text-decoration:none;
+    background:linear-gradient(140deg,#37b6ff,#1a6fd4);color:#fff;
+    font-size:15px;font-weight:700;letter-spacing:1px;
+    box-shadow:0 8px 20px rgba(55,182,255,.22);
+  }
+  .card.urgent .call{background:linear-gradient(140deg,#ff6b6b,#c0261f);box-shadow:0 8px 20px rgba(255,107,107,.22)}
+  .call:active{transform:scale(.985)}
+  .call small{font-size:11px;font-weight:500;opacity:.8;letter-spacing:0}
+
+  .t{display:flex;align-items:center;gap:8px;margin:24px 0 12px}
+  .t::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--brand)}
+  .t span{font-size:13.5px;font-weight:600;letter-spacing:.4px}
+
+  .check{display:grid;gap:9px}
+  .ck{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.65;color:#cfdcf4}
+  .ck i{
+    width:16px;height:16px;border-radius:5px;flex:0 0 auto;margin-top:1px;
+    border:1.5px solid rgba(55,182,255,.5);background:rgba(55,182,255,.12);
+    display:grid;place-items:center;font-size:10px;color:var(--brand);font-style:normal;
+  }
+
+  .myth{display:grid;gap:12px}
+  .mi{padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .mi .bad{font-size:12px;color:#ff9b9b;line-height:1.6;margin-bottom:5px}
+  .mi .good{font-size:12.5px;color:#d7e5ff;line-height:1.7}
+  .mi .good b{color:var(--ok)}
+
+  .foot{text-align:center;font-size:11px;color:#64748b;line-height:1.9;margin-top:20px}
+  .foot .hr{height:1px;background:var(--line);margin:16px 0}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="logo">急</div>
+    <div>
+      <h1>内蒙古师范大学 · 反诈求助卡</h1>
+      <p>反诈小安 · 存下来，出事照着打</p>
+    </div>
+  </div>
+
+  <div class="tip">
+    <b>已经转账了？先做三件事：</b>① 停止一切转账　② 截图保存聊天和转账记录（别删）　③ 打电话报警或直接去派出所
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" data-campus="saihan">赛罕校区</div>
+    <div class="tab" data-campus="shengle">盛乐校区</div>
+  </div>
+
+  <!-- ===== 赛罕 ===== -->
+  <div id="saihan">
+    <div class="card urgent">
+      <div class="row">
+        <div class="ico">🚔</div>
+        <div class="info">
+          <div class="lab">辖区派出所 · 报案去这里</div>
+          <div class="name">大学西路派出所</div>
+          <div class="addr">
+            赛罕区新建西街 5 号（学校北门斜对面）<br>
+            <b>从北门出去，步行约 5 分钟</b>
+          </div>
+        </div>
+      </div>
+      <a class="call" href="tel:04714964903">📞 0471-4964903 <small>点击拨打</small></a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="ico">🛡️</div>
+        <div class="info">
+          <div class="lab">学校保卫处 · 24 小时</div>
+          <div class="name">保卫处值班室</div>
+          <div class="addr">赛罕校区保卫处楼一楼值班室<br>可协助对接警方、调取校园监控</div>
+        </div>
+      </div>
+      <a class="call" href="tel:04714392110">📞 0471-4392110 <small>点击拨打</small></a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="ico">👮</div>
+        <div class="info">
+          <div class="lab">驻校警长</div>
+          <div class="name">校园民警</div>
+          <div class="addr">在校内遇到紧急情况，可直接联系</div>
+        </div>
+      </div>
+      <a class="call" href="tel:13347148110">📞 13347148110 <small>点击拨打</small></a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="ico">💬</div>
+        <div class="info">
+          <div class="lab">心理健康教育中心</div>
+          <div class="name">悦心空间</div>
+          <div class="addr">学生公寓 8 号楼“一站式”学生社区北侧<br>企业微信 → 工作台 → 学工服务 → 心理健康</div>
+        </div>
+      </div>
+      <a class="call" href="tel:04717388380">📞 0471-7388380 <small>点击拨打</small></a>
+    </div>
+  </div>
+
+  <!-- ===== 盛乐 ===== -->
+  <div id="shengle" class="hide">
+    <div class="card urgent">
+      <div class="row">
+        <div class="ico">🚔</div>
+        <div class="info">
+          <div class="lab">辖区派出所 · 报案去这里</div>
+          <div class="name">盛乐派出所</div>
+          <div class="addr">
+            学校东门正南方向约 90 米<br>
+            <b>从东门出去，步行约 10 分钟</b>
+          </div>
+        </div>
+      </div>
+      <a class="call" href="tel:04717390280">📞 0471-7390280 <small>点击拨打</small></a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="ico">🛡️</div>
+        <div class="info">
+          <div class="lab">学校保卫处 · 24 小时</div>
+          <div class="name">保卫处值班室</div>
+          <div class="addr">盛乐校区行政楼西侧一楼值班室<br>可协助对接警方、调取校园监控</div>
+        </div>
+      </div>
+      <a class="call" href="tel:04717384110">📞 0471-7384110 <small>点击拨打</small></a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="ico">👮</div>
+        <div class="info">
+          <div class="lab">驻校警长</div>
+          <div class="name">校园民警</div>
+          <div class="addr">在校内遇到紧急情况，可直接联系</div>
+        </div>
+      </div>
+      <a class="call" href="tel:13847132888">📞 13847132888 <small>点击拨打</small></a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="ico">🏢</div>
+        <div class="info">
+          <div class="lab">学生工作处 / 资助管理中心</div>
+          <div class="name">学生事务中心 A 座 305 室</div>
+          <div class="addr">资助、处分、学籍相关问题可咨询</div>
+        </div>
+      </div>
+      <a class="call" href="tel:04717388385">📞 0471-7388385 <small>点击拨打</small></a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="ico">💬</div>
+        <div class="info">
+          <div class="lab">心理健康教育中心</div>
+          <div class="name">学生事务中心 B305 / B306</div>
+          <div class="addr">企业微信 → 工作台 → 学工服务 → 心理健康</div>
+        </div>
+      </div>
+      <a class="call" href="tel:04717388380">📞 0471-7388380 <small>点击拨打</small></a>
+    </div>
+  </div>
+
+  <!-- 通用 -->
+  <div class="t"><span>报案带什么（缺一样会多跑一趟）</span></div>
+  <div class="card">
+    <div class="check">
+      <div class="ck"><i>✓</i><div>本人身份证</div></div>
+      <div class="ck"><i>✓</i><div>转账记录完整截图（金额、时间、收款方）</div></div>
+      <div class="ck"><i>✓</i><div>聊天记录完整截图，一条都别删</div></div>
+      <div class="ck"><i>✓</i><div>对方的账号、收款码、电话、网址</div></div>
+    </div>
+  </div>
+
+  <div class="t"><span>三个最常见的误解</span></div>
+  <div class="myth">
+    <div class="mi">
+      <div class="bad">✕ 要等金额够立案标准才能报案</div>
+      <div class="good"><b>✓</b> 不用。直接去派出所说明情况就会受理，够不够立案是警方判断的事。</div>
+    </div>
+    <div class="mi">
+      <div class="bad">✕ 几百块钱报案没用</div>
+      <div class="good"><b>✓</b> 多起案件会合并计算案值。你这几百块，可能是同一个团伙几十起案件里的一环。</div>
+    </div>
+    <div class="mi">
+      <div class="bad">✕ 报案就是走个流程</div>
+      <div class="good"><b>✓</b> 报案后一定要索要《受案回执》——这是后续跟进、查询进展的凭证，没有回执等于没报。</div>
+    </div>
+  </div>
+
+  <div class="card soft" style="margin-top:14px">
+    <div class="rule" style="font-size:12.5px;line-height:1.85;color:#d7e5ff">
+      拿不准就打 <b style="color:#37b6ff">96110</b> 反诈专线；<br>
+      法律问题打 <b style="color:#37b6ff">12348</b> 公共法律服务热线。
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="hr"></div>
+    内蒙古师范大学 · 反诈小安 校园反诈服务台<br>
+    本页面信息来自学校官方公开渠道，以学校最新通知为准
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('on'); });
+      t.classList.add('on');
+      var c = t.dataset.campus;
+      document.getElementById('saihan').classList.toggle('hide', c !== 'saihan');
+      document.getElementById('shengle').classList.toggle('hide', c !== 'shengle');
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+</script>
+</body>
+</html>

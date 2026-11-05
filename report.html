@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>我的防骗体检报告 | 反诈小安</title>
+<style>
+  :root{
+    --bg1:#0b1220; --bg2:#111c33; --card:rgba(255,255,255,.045);
+    --line:rgba(255,255,255,.10); --txt:#e8eefc; --sub:#93a4c3;
+    --brand:#37b6ff; --good:#2fd39a; --warn:#ffbf47; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #14315c 0%, transparent 60%),
+      linear-gradient(165deg,var(--bg1),var(--bg2) 55%,#0a1018);
+    color:var(--txt);min-height:100vh;padding:22px 16px 44px;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:430px;margin:0 auto}
+
+  /* 头部 */
+  .head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .logo{
+    width:38px;height:38px;border-radius:12px;flex:0 0 auto;
+    background:linear-gradient(140deg,#37b6ff,#1a6fd4);
+    display:grid;place-items:center;font-size:19px;font-weight:700;
+    box-shadow:0 8px 22px rgba(55,182,255,.28);
+  }
+  .head h1{font-size:15px;font-weight:600;letter-spacing:.2px}
+  .head p{font-size:11.5px;color:var(--sub);margin-top:2px;letter-spacing:.3px}
+
+  /* 总卡 */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:22px 20px;backdrop-filter:blur(12px);margin-bottom:14px;
+  }
+
+  /* 分数环 */
+  .scorebox{display:flex;align-items:center;gap:20px}
+  .ring{position:relative;width:118px;height:118px;flex:0 0 auto}
+  .ring svg{transform:rotate(-90deg);display:block}
+  .ring .num{
+    position:absolute;inset:0;display:grid;place-content:center;text-align:center;
+  }
+  .ring .num b{font-size:38px;font-weight:800;line-height:1;letter-spacing:-1px}
+  .ring .num span{display:block;font-size:11px;color:var(--sub);margin-top:5px;letter-spacing:2px}
+  .scorebox .meta h2{font-size:17px;font-weight:700;margin-bottom:6px}
+  .scorebox .meta p{font-size:12.5px;color:var(--sub);line-height:1.7}
+  .badge{
+    display:inline-block;margin-top:9px;padding:4px 11px;border-radius:999px;
+    font-size:11.5px;font-weight:600;letter-spacing:.5px;
+  }
+
+  /* 标题行 */
+  .t{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+  .t::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--brand)}
+  .t span{font-size:13.5px;font-weight:600;letter-spacing:.4px}
+
+  /* 雷达图 */
+  .radar{display:grid;place-items:center;padding:4px 0 2px}
+  .legend{margin-top:12px;display:grid;gap:9px}
+  .lg{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .lg i{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  .lg .n{color:var(--sub);flex:1}
+  .lg .v{font-variant-numeric:tabular-nums;font-weight:700;font-size:12.5px}
+  .lg .bar{flex:0 0 64px;height:4px;border-radius:2px;background:rgba(255,255,255,.10);overflow:hidden}
+  .lg .bar>i{display:block;height:100%;border-radius:2px;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+
+  /* 五阶 */
+  .steps{display:flex;flex-direction:column;gap:8px}
+  .st{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--sub)}
+  .st .dot{
+    width:20px;height:20px;border-radius:50%;flex:0 0 auto;
+    border:1.5px solid var(--line);display:grid;place-items:center;
+    font-size:10px;color:var(--sub);
+  }
+  .st.done .dot{background:rgba(47,211,154,.16);border-color:rgba(47,211,154,.5);color:var(--good)}
+  .st.stop .dot{background:rgba(255,107,107,.16);border-color:rgba(255,107,107,.55);color:var(--bad)}
+  .st.cur{color:var(--txt);font-weight:600}
+  .st .tag{
+    margin-left:auto;font-size:10.5px;padding:2px 8px;border-radius:999px;
+    background:rgba(255,255,255,.06);color:var(--sub);
+  }
+  .st.stop .tag{background:rgba(255,107,107,.14);color:var(--bad)}
+
+  /* 三句 */
+  .rules{display:grid;gap:10px}
+  .rl{
+    display:flex;gap:11px;align-items:flex-start;padding:12px 13px;border-radius:13px;
+    background:rgba(55,182,255,.07);border:1px solid rgba(55,182,255,.16);
+    font-size:12.5px;line-height:1.65;
+  }
+  .rl b{color:var(--brand);font-size:11px;flex:0 0 auto;margin-top:1px}
+
+  /* 点评 */
+  .note{font-size:13px;line-height:1.85;color:#cfdcf4}
+  .note strong{color:var(--warn);font-weight:600}
+
+  /* 底部 */
+  .foot{text-align:center;font-size:11px;color:#64748b;line-height:1.9;margin-top:6px}
+  .foot .hr{height:1px;background:var(--line);margin:14px 0}
+
+  .btn{
+    display:block;width:100%;padding:13px;border-radius:13px;border:none;cursor:pointer;
+    background:linear-gradient(140deg,#37b6ff,#1a6fd4);color:#fff;
+    font-size:14px;font-weight:600;letter-spacing:.5px;
+    box-shadow:0 10px 26px rgba(55,182,255,.26);
+    font-family:inherit;
+  }
+  .btn:active{transform:scale(.985)}
+  .hint{text-align:center;font-size:11px;color:#64748b;margin-top:10px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="logo">安</div>
+    <div>
+      <h1>内蒙古师范大学 · 校园反诈服务台</h1>
+      <p>反诈小安 · 防骗体检报告</p>
+    </div>
+  </div>
+
+  <!-- 总分 -->
+  <div class="card">
+    <div class="scorebox">
+      <div class="ring">
+        <svg width="118" height="118">
+          <circle cx="59" cy="59" r="49" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/>
+          <circle id="arc" cx="59" cy="59" r="49" fill="none"
+                  stroke="url(#g1)" stroke-width="9" stroke-linecap="round"
+                  stroke-dasharray="307.9" stroke-dashoffset="307.9"
+                  style="transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)"/>
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#2fd39a"/>
+              <stop offset="100%" stop-color="#37b6ff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="num"><b id="scoreTxt">--</b><span>分</span></div>
+      </div>
+      <div class="meta">
+        <h2 id="grade">正在读取…</h2>
+        <p id="gradeDesc">—</p>
+        <div class="badge" id="badge">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 雷达 -->
+  <div class="card">
+    <div class="t"><span>四个维度</span></div>
+    <div class="radar">
+      <svg id="radar" width="290" height="240" viewBox="0 0 290 240"></svg>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <!-- 五阶 -->
+  <div class="card">
+    <div class="t"><span>你在第几阶停下的</span></div>
+    <div class="steps" id="steps"></div>
+  </div>
+
+  <!-- 三句 -->
+  <div class="card">
+    <div class="t"><span>带走这三句</span></div>
+    <div class="rules">
+      <div class="rl"><b>1</b><div>凡是<b style="color:#fff">先交钱</b>的，都是骗。</div></div>
+      <div class="rl"><b>2</b><div>凡是让你<b style="color:#fff">别告诉别人</b>的，都是骗。</div></div>
+      <div class="rl"><b>3</b><div>凡是让你<b style="color:#fff">共享屏幕、借卡过账</b>的，都是骗。</div></div>
+    </div>
+  </div>
+
+  <!-- 点评 -->
+  <div class="card">
+    <div class="t"><span>一句话点评</span></div>
+    <p class="note" id="comment">—</p>
+  </div>
+
+  <button class="btn" onclick="shareTip()">保存这张报告</button>
+  <p class="hint" id="shareHint">截图保存，或者长按页面选择「保存图片」</p>
+
+  <div class="foot">
+    <div class="hr"></div>
+    内蒙古师范大学 · 反诈小安 校园反诈服务台<br>
+    <span id="dateTxt"></span> · 本报告基于本次演练表现生成
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---------- 读取参数 ----------
+  var q = new URLSearchParams(location.search);
+  function num(k, d){ var v = parseFloat(q.get(k)); return isFinite(v) ? v : d; }
+
+  var t1 = Math.max(0, Math.min(40, num('t1', 30)));  // 识破时机
+  var t2 = Math.max(0, Math.min(25, num('t2', 20)));  // 质疑质量
+  var t3 = Math.max(0, Math.min(20, num('t3', 20)));  // 信息保护
+  var t4 = Math.max(0, Math.min(15, num('t4', 8)));   // 应对动作
+  var stage = Math.max(1, Math.min(5, Math.round(num('s', 3)))); // 停在第几阶
+  var type  = q.get('type') || '刷单兼职';
+  var cmt   = q.get('c') || '你问到了关键的地方，但对方一句“名额就一个”就把你带回来了——下次问出破绽后，直接停下来去核实。';
+  var score = Math.round(t1 + t2 + t3 + t4);
+
+  // ---------- 总分 ----------
+  document.getElementById('scoreTxt').textContent = score;
+  var arc = document.getElementById('arc'), C = 2 * Math.PI * 49;
+  arc.setAttribute('stroke-dasharray', C.toFixed(1));
+  setTimeout(function(){ arc.setAttribute('stroke-dashoffset', (C * (1 - score / 100)).toFixed(1)); }, 120);
+
+  var g, gd, col;
+  if (score >= 90)      { g='防骗高手'; gd='对方刚开口你就起疑了，这种反应很难被套住。'; col='#2fd39a'; }
+  else if (score >= 75) { g='警惕性不错'; gd='能发现问题，但还会被"限时"这类话术带走一下。'; col='#37b6ff'; }
+  else if (score >= 60) { g='刚够用'; gd='中途察觉到不对，但已经给出去了一部分信息。'; col='#ffbf47'; }
+  else if (score >= 40) { g='需要练'; gd='被推进到较深的位置才发现，下次要在"要钱"之前就停。'; col='#ff9f43'; }
+  else                  { g='高危'; gd='几乎全程跟着对方走。记住：先交钱、别告诉别人、共享屏幕，这三句话一出就停。'; col='#ff6b6b'; }
+
+  document.getElementById('grade').textContent = g;
+  document.getElementById('gradeDesc').textContent = gd;
+  var badge = document.getElementById('badge');
+  badge.textContent = '本次演练 · ' + type;
+  badge.style.background = 'rgba(255,255,255,.06)';
+  badge.style.color = col;
+  badge.style.border = '1px solid ' + col + '55';
+
+  // ---------- 雷达图 ----------
+  var axes = [
+    {name:'识破时机', v:t1, max:40, color:'#2fd39a'},
+    {name:'质疑质量', v:t2, max:25, color:'#37b6ff'},
+    {name:'信息保护', v:t3, max:20, color:'#a78bfa'},
+    {name:'应对动作', v:t4, max:15, color:'#ffbf47'}
+  ];
+  var cx = 145, cy = 118, R = 82;
+  function pt(i, r){
+    var a = -Math.PI/2 + i * (Math.PI*2/axes.length);
+    return [cx + Math.cos(a)*r, cy + Math.sin(a)*r];
+  }
+  var svg = document.getElementById('radar'), NS = 'http://www.w3.org/2000/svg';
+  function el(t, at){
+    var e = document.createElementNS(NS, t);
+    for (var k in at) e.setAttribute(k, at[k]);
+    return e;
+  }
+  // 网格
+  [0.25, 0.5, 0.75, 1].forEach(function(r){
+    var d = axes.map(function(_, i){ var p = pt(i, R*r); return (i?'L':'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ') + 'Z';
+    svg.appendChild(el('path', {d:d, fill:'none', stroke:'rgba(255,255,255,.075)', 'stroke-width':1}));
+  });
+  axes.forEach(function(_, i){
+    var p = pt(i, R);
+    svg.appendChild(el('line', {x1:cx, y1:cy, x2:p[0], y2:p[1], stroke:'rgba(255,255,255,.075)', 'stroke-width':1}));
+  });
+  // 数据多边形
+  var dpath = axes.map(function(a, i){
+    var p = pt(i, R * Math.max(0.05, a.v / a.max));
+    return (i?'L':'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1);
+  }).join(' ') + 'Z';
+  var poly = el('path', {d:dpath, fill:'rgba(55,182,255,.26)', stroke:'#37b6ff', 'stroke-width':2, 'stroke-linejoin':'round'});
+  svg.appendChild(poly);
+  // 顶点
+  axes.forEach(function(a, i){
+    var p = pt(i, R * Math.max(0.05, a.v / a.max));
+    svg.appendChild(el('circle', {cx:p[0], cy:p[1], r:3.6, fill:a.color}));
+  });
+  // 轴标签
+  axes.forEach(function(a, i){
+    var p = pt(i, R + 26);
+    var tx = el('text', {
+      x:p[0], y:p[1], fill:'#93a4c3', 'font-size':'11.5',
+      'text-anchor': Math.abs(p[0]-cx) < 8 ? 'middle' : (p[0] > cx ? 'start' : 'end'),
+      'dominant-baseline':'middle', 'font-family':'inherit'
+    });
+    tx.textContent = a.name;
+    svg.appendChild(tx);
+  });
+
+  // 图例
+  var lg = document.getElementById('legend');
+  axes.forEach(function(a){
+    var pct = Math.round(a.v / a.max * 100);
+    var row = document.createElement('div');
+    row.className = 'lg';
+    row.innerHTML =
+      '<i style="background:'+a.color+'"></i>' +
+      '<span class="n">'+a.name+'</span>' +
+      '<span class="bar"><i style="background:'+a.color+'" data-w="'+pct+'"></i></span>' +
+      '<span class="v" style="color:'+a.color+'">'+a.v+'<span style="color:#64748b;font-weight:400">/'+a.max+'</span></span>';
+    lg.appendChild(row);
+  });
+  setTimeout(function(){
+    document.querySelectorAll('.lg .bar > i').forEach(function(e){ e.style.width = e.dataset.w + '%'; });
+  }, 260);
+
+  // ---------- 五阶 ----------
+  var stageNames = ['建立信任','制造恐惧或稀缺','隐性隔离','引导操作','加码'];
+  var st = document.getElementById('steps');
+  stageNames.forEach(function(n, i){
+    var idx = i + 1;
+    var cls = 'st';
+    if (idx < stage) cls += ' done';
+    if (idx === stage) cls += ' stop cur';
+    var tag = '';
+    if (idx < stage) tag = '<span class="tag">扛住了</span>';
+    if (idx === stage) tag = '<span class="tag">停在这里</span>';
+    st.innerHTML += '<div class="'+cls+'"><span class="dot">'+(idx<stage?'✓':idx)+'</span>'+
+                    '<span>第'+idx+'阶 · '+n+'</span>'+tag+'</div>';
+  });
+
+  // ---------- 点评 / 日期 ----------
+  document.getElementById('comment').innerHTML = cmt;
+  var d = new Date();
+  document.getElementById('dateTxt').textContent =
+    d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+})();
+
+function shareTip(){
+  var h = document.getElementById('shareHint');
+  h.textContent = 'iPhone：同时按「音量+」和「电源键」；安卓：按「电源键」和「音量-」';
+  h.style.color = '#37b6ff';
+  setTimeout(function(){ h.style.color = '#64748b'; }, 4000);
+}
+</script>
+</body>
+</html>
