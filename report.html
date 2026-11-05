@@ -80,9 +80,12 @@
   .st.done .dot{background:rgba(47,211,154,.16);border-color:rgba(47,211,154,.5);color:var(--good)}
   .st.stop .dot{background:rgba(255,107,107,.16);border-color:rgba(255,107,107,.55);color:var(--bad)}
   .st.cur{color:var(--txt);font-weight:600}
+  .st>span:nth-child(2){
+    flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
   .st .tag{
-    margin-left:auto;font-size:10.5px;padding:2px 8px;border-radius:999px;
-    background:rgba(255,255,255,.06);color:var(--sub);
+    flex:0 0 auto;margin-left:8px;font-size:10.5px;padding:2px 8px;border-radius:999px;
+    background:rgba(255,255,255,.06);color:var(--sub);white-space:nowrap;
   }
   .st.stop .tag{background:rgba(255,107,107,.14);color:var(--bad)}
 
@@ -112,6 +115,13 @@
   }
   .btn:active{transform:scale(.985)}
   .hint{text-align:center;font-size:11px;color:#64748b;margin-top:10px;line-height:1.7}
+
+  /* 桌面端适度加宽，避免投屏时两侧大片空白 */
+  @media (min-width: 760px){
+    body{padding:40px 24px 60px}
+    .wrap{max-width:520px}
+    .card{padding:24px 26px}
+  }
 </style>
 </head>
 <body>
