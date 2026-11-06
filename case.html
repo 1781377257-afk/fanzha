@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>案例还原 · 反诈小安</title>
+<style>
+  :root{
+    --bg:#05080f;--txt:#eef4ff;--sub:#8ea3c2;--dim:#5b708f;
+    --brand:#37b6ff;--ok:#2fd39a;--bad:#ff5b5b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:radial-gradient(900px 500px at 50% -8%,#0f2743 0%,transparent 60%),var(--bg);
+    color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;
+  }
+  header{
+    flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:14px 16px;
+  }
+  .back{
+    width:34px;height:34px;border-radius:11px;display:grid;place-items:center;
+    background:rgba(255,255,255,.06);color:#9fbbdc;text-decoration:none;font-size:16px;
+  }
+  header h1{font-size:14px;font-weight:700;letter-spacing:.5px}
+  header p{font-size:10.5px;color:var(--dim);margin-top:2px;letter-spacing:.5px}
+
+  .stage{flex:1 1 auto;display:flex;justify-content:center;padding:6px 14px 0}
+  .phone{
+    width:100%;max-width:392px;display:flex;flex-direction:column;
+    border-radius:22px 22px 0 0;overflow:hidden;
+    background:#ededed;box-shadow:0 -10px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08);
+    max-height:calc(100vh - 90px);
+  }
+  /* 微信样式头 */
+  .wxh{
+    flex:0 0 auto;display:flex;align-items:center;gap:8px;
+    padding:11px 14px;background:#f7f7f7;border-bottom:1px solid #dcdcdc;
+  }
+  .wxh .bk{color:#333;font-size:15px}
+  .wxh .tt{font-size:14px;font-weight:600;color:#1a1a1a}
+  .wxh .st{font-size:10px;color:#999;margin-left:auto}
+
+  /* 聊天区 */
+  .chat{
+    flex:1 1 auto;overflow-y:auto;padding:14px 12px 24px;
+    background:#ededed;display:flex;flex-direction:column;gap:12px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .time{align-self:center;font-size:10px;color:#a3a3a3;background:rgba(0,0,0,.04);
+        padding:2px 8px;border-radius:6px}
+  .row{display:flex;gap:8px;max-width:100%;animation:pop .34s cubic-bezier(.2,.9,.3,1) both}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  .row.r{flex-direction:row-reverse}
+  .av{
+    width:34px;height:34px;border-radius:6px;flex:0 0 auto;display:grid;place-items:center;
+    font-size:12px;color:#fff;font-weight:600;
+  }
+  .row.l .av{background:linear-gradient(150deg,#5a7fa6,#3a5a7d)}
+  .row.r .av{background:linear-gradient(150deg,#37b6ff,#1a6fd4)}
+  .bub{
+    max-width:74%;padding:9px 12px;border-radius:6px;font-size:13.5px;line-height:1.65;
+    color:#1a1a1a;position:relative;word-break:break-word;
+  }
+  .row.l .bub{background:#fff}
+  .row.r .bub{background:#95ec69}
+  .bub .qr{
+    width:88px;height:88px;border-radius:4px;margin-top:7px;background:#fff;
+    border:1px solid #e2e2e2;
+    background-image:
+      repeating-linear-gradient(0deg,#222 0 4px,transparent 4px 8px),
+      repeating-linear-gradient(90deg,#222 0 4px,transparent 4px 8px);
+    opacity:.85;
+  }
+  .bub .pay{
+    margin-top:7px;background:#f7f7f7;border-radius:5px;padding:9px 11px;
+    display:flex;align-items:center;justify-content:space-between;
+    border:1px solid #e8e8e8;
+  }
+  .bub .pay b{color:#fa5151;font-size:16px}
+  .bub .pay span{font-size:10.5px;color:#888}
+  .bub .img{
+    width:150px;height:96px;border-radius:4px;margin-top:7px;
+    background:linear-gradient(140deg,#dfe7f0,#c3d2e2);
+    display:grid;place-items:center;font-size:10.5px;color:#7c8ea3;
+    border:1px solid #e2e2e2;
+  }
+  /* 钩子标记 */
+  .row.hook .bub{outline:2px solid rgba(255,90,90,.85);outline-offset:2px}
+  .row.hook::after{
+    content:"钩子";position:absolute;right:100%;margin-right:8px;
+  }
+  .mark{
+    align-self:center;font-size:10.5px;color:#ff8b8b;background:rgba(255,90,90,.10);
+    border:1px solid rgba(255,90,90,.28);padding:4px 10px;border-radius:999px;
+    animation:pop .3s both;letter-spacing:.5px;
+  }
+
+  /* 底部操作 */
+  .ops{
+    flex:0 0 auto;padding:12px 14px calc(14px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,rgba(5,8,15,.0),rgba(5,8,15,.92) 40%);
+    display:grid;gap:9px;
+  }
+  .btn{
+    display:block;width:100%;padding:14px;border:none;border-radius:13px;cursor:pointer;
+    font-family:inherit;font-size:14.5px;font-weight:700;letter-spacing:.5px;
+  }
+  .btn.p{background:linear-gradient(140deg,#37b6ff,#1a6fd4);color:#fff;box-shadow:0 10px 26px rgba(55,182,255,.26)}
+  .btn.g{background:rgba(255,255,255,.07);color:#c2d4ea;border:1px solid rgba(255,255,255,.10)}
+  .btn:active{transform:scale(.985)}
+
+  /* 揭秘 */
+  .reveal{
+    position:fixed;inset:0;z-index:40;display:none;align-items:flex-end;justify-content:center;
+    background:rgba(3,6,12,.72);backdrop-filter:blur(4px);
+  }
+  .reveal.on{display:flex}
+  .sheet{
+    width:100%;max-width:430px;background:linear-gradient(180deg,#0d1726,#0a121e);
+    border-radius:22px 22px 0 0;padding:22px 20px calc(20px + env(safe-area-inset-bottom));
+    border-top:1px solid rgba(255,255,255,.10);animation:up .4s cubic-bezier(.2,.9,.3,1) both;
+  }
+  @keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .sheet h2{font-size:18px;font-weight:800;margin-bottom:6px}
+  .sheet .s{font-size:12px;color:var(--sub);line-height:1.8;margin-bottom:16px}
+  .rk{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid rgba(255,255,255,.07)}
+  .rk i{
+    width:20px;height:20px;border-radius:6px;flex:0 0 auto;display:grid;place-items:center;
+    background:rgba(255,91,91,.16);color:#ff8b8b;font-size:11px;font-style:normal;font-weight:700;
+  }
+  .rk p{font-size:12.5px;line-height:1.75;color:#cfdcf4}
+  .sheet .btns{display:grid;gap:9px;margin-top:18px}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" id="back" href="index.html">‹</a>
+  <div>
+    <h1 id="ttl">案例还原</h1>
+    <p>以下对话改编自真实骗术，逐条还原</p>
+  </div>
+</header>
+
+<div class="stage">
+  <div class="phone">
+    <div class="wxh">
+      <span class="bk">‹</span>
+      <span class="tt" id="who">—</span>
+      <span class="st" id="cnt"></span>
+    </div>
+    <div class="chat" id="chat"></div>
+  </div>
+</div>
+
+<div class="ops" id="ops">
+  <button class="btn g" id="skip">跳过，直接看揭秘</button>
+</div>
+
+<div class="reveal" id="reveal">
+  <div class="sheet">
+    <h2 id="rvTtl">这是骗局吗？</h2>
+    <div class="s" id="rvS"></div>
+    <div id="rvList"></div>
+    <div class="btns">
+      <a class="btn p" id="toChat" href="chat.html">让 AI 跟我演一遍</a>
+      <button class="btn g" id="close">再看一遍</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var CASES = [
+    {
+      key:'teacher',
+      title:'冒充老师收费',
+      who:'班级群（28）',
+      msgs:[
+        {s:'c', t:'今天 09:14'},
+        {s:'l', av:'王', n:'王老师',
+         txt:'同学们早上好，这学期的教辅资料学校统一订，每人 198。'},
+        {s:'l', av:'王', n:'王老师',
+         txt:'今天下午 5 点前交齐，我统一报上去。', hook:true,
+         note:'“今天 5 点前”——制造时间压力，让你来不及核实'},
+        {s:'l', av:'王', n:'王老师',
+         txt:'扫码备注学号，我按名单发书。', qr:true,
+         note:'个人收款码出现在班级群——真正的学校收费走官方缴费平台'},
+        {s:'r', av:'我', txt:'好的老师，我扫了'},
+        {s:'l', av:'李', n:'张同学',
+         txt:'我也交了，大家都交一下，别耽误'},
+        {s:'c', t:'——'},
+        {s:'sys', txt:'两个小时后，真正的辅导员在群里发了一条消息：',
+         note:'刚才那个“王老师”，是用被盗账号伪装的头像和昵称'}
+      ],
+      reveal:{
+        t:'这是典型骗局',
+        s:'群里那个“王老师”的号，是被盗的。他换了头像和昵称，等了一周才发消息。',
+        list:[
+          '群通知 ≠ 学校通知。学校收费一律走官方缴费平台，不会用个人收款码。',
+          '“今天 5 点前”“大家都交了”——这两句都是为了让你跳过核实。',
+          '真正的老师不会让学生在群里扫个人码。你只要回一句“我问问班长”，他就没戏了。'
+        ]
+      }
+    },
+    {
+      key:'brush',
+      title:'刷单返利',
+      who:'兼职招聘 · 私聊',
+      msgs:[
+        {s:'l', av:'兼', n:'派单员',
+         txt:'同学你好，线上兼职，帮商家走个销量，动动手指日赚 300。'},
+        {s:'l', av:'兼', n:'派单员',
+         txt:'规则很简单：你先垫付，完成一单立刻返本 + 佣金。', hook:true,
+         note:'“垫付”两个字一出现，这就已经是骗局了'},
+        {s:'r', av:'我', txt:'真的假的？'},
+        {s:'l', av:'兼', n:'派单员',
+         txt:'第一单 20 块，你试试。', pay:'垫付 20，返 25'},
+        {s:'c', t:'30 秒后'},
+        {s:'l', av:'兼', n:'派单员', txt:'已返 25，查一下。'},
+        {s:'l', av:'兼', n:'派单员',
+         txt:'第二单大一点，垫 300 返 330。', pay:'垫付 300，返 330',
+         note:'第一单真返钱，就是这个骗局最狠的地方——20 块买你的信任'},
+        {s:'r', av:'我', txt:'行，我垫'},
+        {s:'l', av:'兼', n:'派单员',
+         txt:'系统显示任务未完成，需连做三单才能一起提现。', hook:true,
+         note:'“提现不了”是标准剧本：让你为了拿回前面的钱，继续投更多'}
+      ],
+      reveal:{
+        t:'这是刷单诈骗，100%',
+        s:'你收到的那 20 块，是骗子成本最低的一笔投资。',
+        list:[
+          '凡是让你先垫钱的兼职，都是骗。没有例外。',
+          '第一单真返现 = 钩子。它让你相信“垫了也会返”。',
+          '“任务未完成不能提现”是让你投更多的借口，投多少都提不出来。',
+          '刷单本身也是违法的——不只是被骗，你还可能成了帮凶。'
+        ]
+      }
+    },
+    {
+      key:'kefu',
+      title:'客服退款',
+      who:'陌生号码 · 来电',
+      msgs:[
+        {s:'c', t:'来电 00:00'},
+        {s:'sys', txt:'一个显示为“快递客服”的号码打了进来，对方能准确报出你的名字和快递单号。',
+         note:'信息准确 ≠ 身份真实。你的物流信息可能已经被卖过好几轮'},
+        {s:'l', av:'客', n:'客服',
+         txt:'您好，您的包裹在运输中丢失了，我们按三倍赔付，一共 288 元。'},
+        {s:'l', av:'客', n:'客服',
+         txt:'加个微信，我教您操作，两分钟就好。', hook:true,
+         note:'正规理赔原路退回，从不需要加私人微信'},
+        {s:'r', av:'我', txt:'哦哦，好的'},
+        {s:'l', av:'客', n:'客服',
+         txt:'您下载一下这个“理赔助手”，我这边帮您远程看下。', hook:true,
+         note:'让你装陌生 App、开屏幕共享——这是盗刷的前一步'},
+        {s:'l', av:'客', n:'客服',
+         txt:'现在打开屏幕共享，我把流程走一遍给您看。',
+         note:'共享屏幕 = 把手机交给他。你输的密码和验证码，他全看得见'}
+      ],
+      reveal:{
+        t:'这是冒充客服诈骗',
+        s:'对方连单号都说对了，但这恰恰是陷阱的一部分。',
+        list:[
+          '理赔不需要加微信、不需要下载 App、不需要共享屏幕。',
+          '共享屏幕时，你输入的密码、收到的验证码，对方全部可见。',
+          '只要你挂了电话，自己去官方 App 看订单状态，这个骗局就进行不下去。',
+          '记住一句：主动联系你的“客服”，99% 是骗子。'
+        ]
+      }
+    },
+    {
+      key:'jianzhi',
+      title:'兼职押金',
+      who:'私聊 · 学长',
+      msgs:[
+        {s:'l', av:'学', n:'学长',
+         txt:'学弟，我这边有个家教的活，一小时 200，你要不要？'},
+        {s:'r', av:'我', txt:'这么多？靠谱吗'},
+        {s:'l', av:'学', n:'学长',
+         txt:'我们跟机构合作的，我发个工作证给你看。', img:'工作证.jpg',
+         note:'一张截图证明不了任何事——PS 成本几乎是零'},
+        {s:'l', av:'学', n:'学长',
+         txt:'不过要先交 300 服装费，上完第一节课就退给你。', hook:true,
+         note:'正规兼职从不提前收费。服装费、押金、信息费，是同一套。'},
+        {s:'r', av:'我', txt:'怎么是转你个人微信？'},
+        {s:'l', av:'学', n:'学长',
+         txt:'财务走流程慢，我先垫着，你直接转我。', hook:true,
+         note:'“财务走流程慢”是让你转到个人账户的通用借口'},
+        {s:'c', t:'交了 300 之后'},
+        {s:'sys', txt:'对方说“家长那边在排时间”，让你等等。三天后，你发消息过去——红色感叹号。'}
+      ],
+      reveal:{
+        t:'这是兼职押金诈骗',
+        s:'一小时 200 的家教是真的存在，但这一单是假的。',
+        list:[
+          '凡是先交钱的兼职，一律不做。这条没有例外。',
+          '“名额就一个”“今天定下来”——急，就是不让你核实。',
+          '转个人微信还是公司账户，是最好用的照妖镜。个人收款，直接停。',
+          '想试探很简单：让对方先安排一次线上试讲。真雇主不怕试。'
+        ]
+      }
+    },
+    {
+      key:'jieka',
+      title:'借卡走账',
+      who:'游戏好友 · 认识 1 年',
+      msgs:[
+        {s:'l', av:'友', n:'老K',
+         txt:'兄弟，帮个忙。我朋友要转钱给我，我微信限额收不了。'},
+        {s:'l', av:'友', n:'老K',
+         txt:'你把收款码发我，他转给你，你再转我，我给你 1000 辛苦费。', hook:true,
+         note:'这不是帮忙，这是“跑分”——用你的账户洗别人的赃款'},
+        {s:'r', av:'我', txt:'这样不太好吧'},
+        {s:'l', av:'友', n:'老K',
+         txt:'就过一下账，又不是你的钱，能有啥事。', hook:true,
+         note:'“又不是你的钱”——这句话最要命。过账的是赃款，卡是你的。'},
+        {s:'c', t:'三天后'},
+        {s:'sys', txt:'你的银行卡被冻结。学校通知你去派出所说明情况——那张卡成了涉案卡。',
+         note:'帮信罪：帮助信息网络犯罪活动罪，最高三年以下有期徒刑或拘役'}
+      ],
+      reveal:{
+        t:'这不是帮忙，是犯罪',
+        s:'这里没有受害者，只有帮凶。你可能一分钱没拿到，责任却要担。',
+        list:[
+          '只要有人要用你的卡、号、收款码“过一下账”还给钱，直接拒绝。',
+          '可能构成帮助信息网络犯罪活动罪（刑法第二百八十七条之二），最高三年。',
+          '校纪上：条例第二十二条第三项，受记过以上处分者不授予学位。',
+          '已经被牵扯进去，第一时间告诉辅导员——条例第二十条，主动交代可以从轻。瞒着才是最坏的选择。'
+        ]
+      }
+    }
+  ];
+
+  var qs = new URLSearchParams(location.search);
+  var idx = Math.max(0, Math.min(CASES.length - 1, (parseInt(qs.get('c'), 10) || 1) - 1));
+  var C = CASES[idx];
+
+  document.title = C.title + ' · 案例还原';
+  document.getElementById('ttl').textContent = C.title;
+  document.getElementById('who').textContent = C.who;
+
+  var chat = document.getElementById('chat');
+  var ops = document.getElementById('ops');
+  var revealBox = document.getElementById('reveal');
+  var timer = null, i = 0, done = false;
+
+  function bubbleEl(m){
+    var row = document.createElement('div');
+    if (m.s === 'c'){
+      row.className = 'time'; row.textContent = m.t; return row;
+    }
+    if (m.s === 'sys'){
+      var d = document.createElement('div');
+      d.className = 'mark'; d.style.cssText = 'align-self:stretch;text-align:left;line-height:1.7;max-width:100%';
+      d.textContent = m.txt;
+      var wrap = document.createElement('div');
+      wrap.appendChild(d);
+      if (m.note){
+        var nn = document.createElement('div');
+        nn.style.cssText = 'font-size:10.5px;color:#7f93ad;line-height:1.7;margin-top:6px;padding-left:2px';
+        nn.textContent = '· ' + m.note;
+        wrap.appendChild(nn);
+      }
+      return wrap;
+    }
+    row.className = 'row ' + (m.s === 'r' ? 'r' : 'l') + (m.hook ? ' hook' : '');
+    row.innerHTML =
+      '<div class="av">' + (m.av || '') + '</div>' +
+      '<div class="bub">' + m.txt.replace(/\n/g, '<br>') +
+        (m.pay ? '<div class="pay"><b>' + m.pay + '</b><span>待支付</span></div>' : '') +
+        (m.qr ? '<div class="qr"></div>' : '') +
+        (m.img ? '<div class="img">' + m.img + '</div>' : '') +
+      '</div>';
+    return row;
+  }
+
+  function step(){
+    if (i >= C.msgs.length){ finish(); return; }
+    var m = C.msgs[i];
+    var el = bubbleEl(m);
+    chat.appendChild(el);
+    el.scrollIntoView({behavior:'smooth', block:'end'});
+
+    // 钩子提示
+    if (m.note && m.s !== 'sys'){
+      setTimeout(function(){
+        var tip = document.createElement('div');
+        tip.className = 'mark';
+        tip.textContent = '钩子：' + m.note;
+        tip.style.cssText += ';align-self:flex-start;max-width:88%;line-height:1.7;text-align:left';
+        chat.appendChild(tip);
+        chat.scrollIntoView && chat.scrollTo({top: chat.scrollHeight, behavior:'smooth'});
+      }, 620);
+    }
+
+    i++;
+    document.getElementById('cnt').textContent = i + '/' + C.msgs.length;
+    timer = setTimeout(step, m.s === 'r' ? 900 : 1500);
+  }
+
+  function finish(){
+    if (done) return;
+    done = true;
+    clearTimeout(timer);
+    ops.innerHTML = '<button class="btn p" id="rv">这是骗局吗？揭晓</button>';
+    document.getElementById('rv').addEventListener('click', showReveal);
+    setTimeout(showReveal, 1600);
+  }
+
+  function showReveal(){
+    document.getElementById('rvTtl').textContent = C.reveal.t;
+    document.getElementById('rvS').textContent = C.reveal.s;
+    document.getElementById('rvList').innerHTML = C.reveal.list.map(function(x, k){
+      return '<div class="rk"><i>' + (k + 1) + '</i><p>' + x + '</p></div>';
+    }).join('');
+    revealBox.classList.add('on');
+  }
+
+  document.getElementById('skip').addEventListener('click', function(){
+    clearTimeout(timer);
+    chat.innerHTML = '';
+    C.msgs.forEach(function(m){
+      var el = bubbleEl(m);
+      chat.appendChild(el);
+      if (m.note && m.s !== 'sys'){
+        var tip = document.createElement('div');
+        tip.className = 'mark';
+        tip.textContent = '钩子：' + m.note;
+        tip.style.cssText += ';align-self:flex-start;max-width:88%;line-height:1.7;text-align:left';
+        chat.appendChild(tip);
+      }
+    });
+    i = C.msgs.length;
+    finish();
+  });
+
+  document.getElementById('close').addEventListener('click', function(){
+    revealBox.classList.remove('on');
+  });
+
+  document.getElementById('back').href = 'index.html';
+
+  timer = setTimeout(step, 500);
+})();
+</script>
+</body>
+</html>

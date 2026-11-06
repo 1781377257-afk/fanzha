@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>骗局档案 · 反诈小安</title>
+<style>
+  :root{
+    --bg:#05080f;--txt:#eef4ff;--sub:#8ea3c2;--brand:#37b6ff;--line:rgba(255,255,255,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    display:flex;flex-direction:column;overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:11px 15px;
+    background:rgba(10,18,30,.92);border-bottom:1px solid var(--line);
+  }
+  .back{
+    width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:0 0 auto;
+    background:rgba(255,255,255,.06);color:#9fbbdc;text-decoration:none;font-size:15px;
+  }
+  header h1{font-size:13.5px;font-weight:700;letter-spacing:.5px}
+  header p{font-size:10px;color:#5b708f;margin-top:1px;letter-spacing:.3px}
+  .bgmbtn{
+    margin-left:auto;width:34px;height:34px;border-radius:50%;flex:0 0 auto;
+    border:1px solid rgba(120,180,255,.3);background:rgba(8,16,28,.8);
+    color:#8fc6ff;font-size:15px;cursor:pointer;display:grid;place-items:center;
+  }
+  .bgmbtn.off{color:#4d6a8c;border-color:rgba(255,255,255,.1)}
+
+  main{flex:1 1 auto;position:relative;background:#0a1018}
+  iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+
+  .tip{
+    position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;
+    font-size:11px;color:#8ea3c2;background:rgba(6,12,22,.86);border:1px solid rgba(120,180,255,.25);
+    border-radius:999px;padding:7px 15px;backdrop-filter:blur(8px);white-space:nowrap;
+    animation:tipfade 5s ease forwards;
+  }
+  @keyframes tipfade{0%,72%{opacity:1}100%{opacity:0;pointer-events:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="index.html">‹</a>
+  <div>
+    <h1>骗局档案</h1>
+    <p>六个案件 · 十八个结局 · 练判断和复盘</p>
+  </div>
+  <button class="bgmbtn off" id="bgmBtn" aria-label="背景音乐">♪</button>
+</header>
+
+<main>
+  <iframe src="https://pluviophile771.github.io/-/"
+          title="骗局档案"
+          allow="fullscreen; autoplay"
+          referrerpolicy="no-referrer"></iframe>
+  <div class="tip" id="tip">点一下页面，背景音乐自动开始</div>
+</main>
+
+<audio id="bgm" src="audio/game_bgm.mp3" loop preload="auto"></audio>
+
+<script>
+(function(){
+  var bgm = document.getElementById('bgm');
+  var btn = document.getElementById('bgmBtn');
+  var tip = document.getElementById('tip');
+  bgm.volume = 0.26;
+
+  function setUI(on){
+    btn.classList.toggle('off', !on);
+    btn.style.color = on ? '#8fc6ff' : '#4d6a8c';
+  }
+
+  // 尝试自动播放；被拦则等首次交互
+  bgm.play().then(function(){ setUI(true); }).catch(function(){});
+
+  function unlock(){
+    bgm.play().then(function(){ setUI(true); }).catch(function(){});
+    window.removeEventListener('pointerdown', unlock);
+    window.removeEventListener('keydown', unlock);
+  }
+  window.addEventListener('pointerdown', unlock, {passive:true});
+  window.addEventListener('keydown', unlock);
+
+  bgm.addEventListener('play', function(){ setUI(true); });
+  bgm.addEventListener('pause', function(){ setUI(false); });
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if (bgm.paused){ bgm.play().catch(function(){}); } else { bgm.pause(); }
+  });
+
+  setTimeout(function(){ if (tip) tip.style.display = 'none'; }, 5200);
+})();
+</script>
+</body>
+</html>
