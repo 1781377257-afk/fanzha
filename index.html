@@ -1179,7 +1179,7 @@
   </footer>
 </main>
 
-<audio id="bgm" src="audio/bgm.mp3" loop preload="auto"></audio>
+<audio id="bgm" data-src="audio/bgm.mp3" loop preload="none"></audio>
 <button class="bgm off" id="bgmBtn" aria-label="背景音乐开关"><span class="ring"></span>♪</button>
 
 <div class="imodal" id="imodal">
@@ -1453,8 +1453,15 @@
     bgmBtn.style.color = bgmOn ? '#8fc6ff' : '#4d6a8c';
   }
 
+  function ensureSrc(){
+    if (!bgm.getAttribute('src')){
+      bgm.setAttribute('src', bgm.getAttribute('data-src'));
+    }
+  }
+
   function tryPlay(){
     if (!bgmWanted) return;
+    ensureSrc();
     var p = bgm.play();
     if (p && p.catch) p.catch(function(){ /* 等待首次交互 */ });
     bgmOn = !bgm.paused;
@@ -1464,6 +1471,7 @@
   // 首次交互后启动（浏览器策略）
   function unlock(){
     if (!bgmWanted) return;
+    ensureSrc();
     bgm.play().then(function(){ bgmOn = true; setBtn(); }).catch(function(){});
     window.removeEventListener('pointerdown', unlock);
     window.removeEventListener('keydown', unlock);
@@ -1481,7 +1489,7 @@
   bgmBtn.addEventListener('click', function(e){
     e.stopPropagation();
     bgmWanted = !bgmWanted;
-    if (bgmWanted){ bgm.play().catch(function(){}); }
+    if (bgmWanted){ ensureSrc(); bgm.play().catch(function(){}); }
     else { bgm.pause(); }
   });
 
@@ -1552,7 +1560,7 @@
   try{
     if (window.CxRobotSdk && CxRobotSdk.js && typeof CxRobotSdk.js.init === "function"){
       CxRobotSdk.js.init(
-        "https://robot.chaoxing.com/embedChat?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae&groupId=0&openType=auto&openPage=coze",
+        "https://robot.chaoxing.com/embedChat?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae&groupId=0&openType=openUrl&openPage=coze",
         "2ac7e2cdb92ee45dc442d13cc3a840e7"
       );
     }
@@ -1571,10 +1579,8 @@
   var loaded = false;
 
   function openD(){
-    if (!loaded && frame){ frame.src = AGENT; loaded = true; }
-    drawer.classList.add('on');
-    mask.classList.add('on');
-    document.body.style.overflow = 'hidden';
+    // 直接新窗口打开访客端：避免 iframe 第三方 Cookie 导致的登录失效/白屏
+    window.open(AGENT, '_blank', 'noopener');
   }
   function closeD(){
     drawer.classList.remove('on');
@@ -1585,23 +1591,8 @@
   if (dx) dx.addEventListener('click', closeD);
   if (mask) mask.addEventListener('click', closeD);
 
-  // 4.5 秒后检查超星 SDK 是否注入了悬浮入口；没有则显示自制入口
-  var baseCount = document.body.children.length;
-  setTimeout(function(){
-    var injected = false;
-    var nodes = document.body.children;
-    for (var i = 0; i < nodes.length; i++){
-      var el = nodes[i];
-      if (el === fab || el === drawer || el === mask) continue;
-      var st = window.getComputedStyle(el);
-      if (st.position === 'fixed' && st.display !== 'none' && el.tagName !== 'SCRIPT'){
-        injected = true; break;
-      }
-    }
-    if (!injected && document.body.children.length >= baseCount && fab){
-      fab.classList.add('show');
-    }
-  }, 4500);
+  // 立即显示入口（iframe/SDK 方案因第三方 Cookie 限制不可靠）
+  setTimeout(function(){ if (fab) fab.classList.add('show'); }, 800);
 })();
 </script>
 
