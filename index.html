@@ -723,14 +723,15 @@
 
   /* ---------- 侧拉对话面板 ---------- */
   .fab{
-    display:none;position:fixed;right:16px;bottom:78px;z-index:70;display:flex;align-items:center;gap:10px;
-    padding:7px 16px 7px 7px;border-radius:999px;border:none;cursor:pointer;
+    display:none;text-decoration:none;position:fixed;right:20px;bottom:100px;z-index:70;align-items:center;gap:10px;
+    padding:6px 16px 6px 6px;border-radius:999px;border:none;cursor:pointer;
     background:linear-gradient(135deg,rgba(18,44,78,.95),rgba(9,20,36,.95));
     border:1px solid rgba(120,180,255,.35);color:#e8f2ff;
     backdrop-filter:blur(12px);box-shadow:0 14px 36px rgba(0,0,0,.55);
     transition:transform .2s,border-color .2s;font-family:inherit;
   }
   .fab.show{display:flex}
+  .fab .fav{width:42px;height:42px;border-radius:50%;flex:0 0 auto;display:block}
   .fab:hover{transform:translateY(-3px);border-color:rgba(120,180,255,.75)}
   .fab .fa{
     width:36px;height:36px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
@@ -739,7 +740,7 @@
   }
   .fab .ft{font-size:12.5px;font-weight:600;letter-spacing:.4px;white-space:nowrap}
   .fab .fp{
-    position:absolute;left:7px;top:50%;margin-top:-23px;width:46px;height:46px;border-radius:50%;
+    position:absolute;left:6px;top:50%;margin-top:-27px;width:54px;height:54px;border-radius:50%;
     border:1px solid rgba(120,180,255,.55);animation:apulse 2.6s ease-out infinite;pointer-events:none;
   }
   @keyframes apulse{0%{transform:scale(.82);opacity:.85}100%{transform:scale(1.6);opacity:0}}
@@ -1000,31 +1001,31 @@
       <div class="s">点开看——这五类骗局，官方是怎么用一个镜头讲明白的。</div>
     </div>
     <div class="vidgrid">
-      <button class="vd" data-v="laoshi.mp4" data-t="冒充老师收费">
+      <button class="vd" data-v="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/laoshi.mp4" data-vf="laoshi.mp4" data-t="冒充老师收费">
         <img src="img/web_case_group_fee.jpg" alt="">
         <span class="src">官方 · 反诈</span>
         <span class="play"></span>
         <span class="cap"><b>冒充老师收费</b><span>国家反诈中心</span></span>
       </button>
-      <button class="vd" data-v="shuadan.mp4" data-t="刷单返利">
+      <button class="vd" data-v="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/shuadan.mp4" data-vf="shuadan.mp4" data-t="刷单返利">
         <img src="img/web_case_shuadan_group.jpg" alt="">
         <span class="src">官方 · 反诈</span>
         <span class="play"></span>
         <span class="cap"><b>刷单返利</b><span>国家反诈中心</span></span>
       </button>
-      <button class="vd" data-v="kefu.mp4" data-t="客服退款">
+      <button class="vd" data-v="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/kefu.mp4" data-vf="kefu.mp4" data-t="客服退款">
         <img src="img/web_case_fake_cs.jpg" alt="">
         <span class="src">官方 · 反诈</span>
         <span class="play"></span>
         <span class="cap"><b>客服退款</b><span>国家反诈中心</span></span>
       </button>
-      <button class="vd" data-v="jianzhi.mp4" data-t="兼职押金">
+      <button class="vd" data-v="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/jianzhi.mp4" data-vf="jianzhi.mp4" data-t="兼职押金">
         <img src="img/web_case_parttime_wx.jpg" alt="">
         <span class="src">官方 · 反诈</span>
         <span class="play"></span>
         <span class="cap"><b>兼职押金</b><span>国家反诈中心</span></span>
       </button>
-      <button class="vd" data-v="jieka.mp4" data-t="借卡走账">
+      <button class="vd" data-v="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/jieka.mp4" data-vf="jieka.mp4" data-t="借卡走账">
         <img src="img/web_case_bank_limit.jpg" alt="">
         <span class="src">官方 · 反诈</span>
         <span class="play"></span>
@@ -1179,7 +1180,7 @@
   </footer>
 </main>
 
-<audio id="bgm" data-src="audio/bgm.mp3" loop preload="none"></audio>
+<audio id="bgm" data-src="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/audio/bgm.mp3" data-src-fb="audio/bgm.mp3" loop preload="none"></audio>
 <button class="bgm off" id="bgmBtn" aria-label="背景音乐开关"><span class="ring"></span>♪</button>
 
 <div class="imodal" id="imodal">
@@ -1453,11 +1454,19 @@
     bgmBtn.style.color = bgmOn ? '#8fc6ff' : '#4d6a8c';
   }
 
+  var bgmTriedFb = false;
   function ensureSrc(){
     if (!bgm.getAttribute('src')){
       bgm.setAttribute('src', bgm.getAttribute('data-src'));
     }
   }
+  bgm.addEventListener('error', function(){
+    if (!bgmTriedFb){
+      bgmTriedFb = true;
+      var fb = bgm.getAttribute('data-src-fb');
+      if (fb){ bgm.setAttribute('src', fb); bgm.load(); bgm.play().catch(function(){}); }
+    }
+  });
 
   function tryPlay(){
     if (!bgmWanted) return;
@@ -1508,6 +1517,13 @@
       if (bgmWasPlaying) bgm.pause();
 
       vtitle.textContent = btn.getAttribute('data-t') || '';
+      vplayer.onerror = function(){
+        var fb = btn.getAttribute('data-vf');
+        if (fb && vplayer.currentSrc.indexOf(fb) < 0){
+          vplayer.src = fb;
+          vplayer.play().catch(function(){});
+        }
+      };
       vplayer.src = src;
       vmodal.classList.add('on');
       vplayer.play().catch(function(){});
@@ -1533,11 +1549,11 @@
 </script>
 
 
-<button class="fab" id="fab" aria-label="和小安对话">
+<a class="fab" id="fab" href="https://robot.chaoxing.com/prime?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae" target="_blank" rel="noopener">
   <span class="fp"></span>
-  <span class="fa">安</span>
+  <img class="fav" src="img/avatar.png" alt="小安">
   <span class="ft">问问小安</span>
-</button>
+</a>
 
 <div class="drawer" id="drawer">
   <div class="dh">
@@ -1553,20 +1569,6 @@
 </div>
 <div class="dmask" id="dmask"></div>
 
-<!-- 超星智能体 Web SDK（侧拉模式，需 https 环境） -->
-<script type="text/javascript" src="https://robot.chaoxing.com/sdk/CxRobotSdk.js"></script>
-<script type="text/javascript">
-(function(){
-  try{
-    if (window.CxRobotSdk && CxRobotSdk.js && typeof CxRobotSdk.js.init === "function"){
-      CxRobotSdk.js.init(
-        "https://robot.chaoxing.com/embedChat?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae&groupId=0&openType=openUrl&openPage=coze",
-        "2ac7e2cdb92ee45dc442d13cc3a840e7"
-      );
-    }
-  }catch(err){}
-})();
-</script>
 
 <script>
 (function(){

@@ -64,12 +64,16 @@
   <div class="tip" id="tip">点一下页面，背景音乐自动开始</div>
 </main>
 
-<audio id="bgm" src="audio/game_bgm.mp3" loop preload="auto"></audio>
+<audio id="bgm" src="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/audio/game_bgm.mp3" data-fb="audio/game_bgm.mp3" loop preload="auto"></audio>
 
 <script>
 (function(){
   var bgm = document.getElementById('bgm');
   var btn = document.getElementById('bgmBtn');
+  bgm.addEventListener('error', function(){
+    var fb = bgm.getAttribute('data-fb');
+    if (fb && bgm.src.indexOf(fb) < 0){ bgm.src = fb; bgm.play().catch(function(){}); }
+  });
   var tip = document.getElementById('tip');
   bgm.volume = 0.26;
 

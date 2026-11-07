@@ -133,10 +133,46 @@
   .sum .row{display:flex;justify-content:space-between;font-size:12.5px;color:#a9bcd6;padding:7px 2px}
   .sum .row b{color:#dfeafc;font-variant-numeric:tabular-nums}
 
+
+  /* ---------- 判定与分析 ---------- */
+  .vhead{display:flex;flex-direction:column;align-items:center;gap:8px;margin:8px 0 4px}
+  .vbadge{
+    font-size:11.5px;font-weight:800;letter-spacing:3px;padding:5px 15px;border-radius:999px;
+  }
+  .vtext{font-size:21px;font-weight:900;letter-spacing:.5px}
+  .ana{margin-top:18px;border-top:1px solid var(--line);padding-top:15px;text-align:left}
+  .ana h4{font-size:11px;color:#7f97b5;letter-spacing:2.5px;margin-bottom:11px}
+  .ana .ln{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.78;color:#c2d4ea;margin-bottom:10px}
+  .ana .ln i{
+    width:19px;height:19px;border-radius:6px;flex:0 0 auto;display:grid;place-items:center;
+    font-size:10px;font-style:normal;font-weight:700;margin-top:1px;
+    background:rgba(255,255,255,.07);color:#9fb6d2;
+  }
+  .ana .ln.bad i{background:rgba(255,91,91,.16);color:#ff8b8b}
+  .ana .ln.good i{background:rgba(47,211,154,.16);color:#7fe3c2}
+
+  /* 胜负特效 */
+  .sum.win .big{color:#7fe3c2;text-shadow:0 0 34px rgba(47,211,154,.45)}
+  .sum.win .grade{box-shadow:0 0 28px rgba(47,211,154,.28)}
+  .sum.lose .big{color:#ff9b9b}
+  body.lose-flash::after{
+    content:"";position:fixed;inset:0;z-index:80;pointer-events:none;
+    background:radial-gradient(circle at 50% 45%,rgba(255,40,40,.30),transparent 62%);
+    animation:lflash .55s ease-out 2;
+  }
+  @keyframes lflash{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+  body.win-flash::after{
+    content:"";position:fixed;inset:0;z-index:80;pointer-events:none;
+    background:radial-gradient(circle at 50% 42%,rgba(47,211,154,.22),transparent 58%);
+    animation:lflash 1.2s ease-out 1;
+  }
   .foot{text-align:center;font-size:10.5px;color:#42566f;letter-spacing:1.5px;margin-top:22px}
 </style>
 </head>
 <body>
+<audio id="gBgm" src="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/audio/game_bgm.mp3" data-fb="audio/game_bgm.mp3" loop preload="none"></audio>
+<audio id="gWin" src="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/audio/win.mp3" data-fb="audio/win.mp3" preload="none"></audio>
+<audio id="gLose" src="https://cdn.jsdelivr.net/gh/1781377257-afk/fanzha@main/audio/lose.mp3" data-fb="audio/lose.mp3" preload="none"></audio>
 <div class="wrap">
 
   <!-- ========== 开场 ========== -->
@@ -168,6 +204,7 @@
     <div class="grade" id="grade">—</div>
     <div class="desc" id="gradeDesc">—</div>
     <div class="rows" id="rows"></div>
+    <div id="ana"></div>
     <div style="margin-top:26px">
       <button class="btn" id="toAgent">让 AI 陪我练一次真对话</button>
       <button class="btn ghost mt" id="again">再闯一次</button>
@@ -182,6 +219,34 @@
   var AGENT = 'https://robot.chaoxing.com/prime?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae';
 
   /* ---------------- 关卡数据 ---------------- */
+
+  /* ============ 背景音乐（只用一个 BGM） ============ */
+  var gBgm = document.getElementById('gBgm');
+  var gWin = document.getElementById('gWin');
+  var gLose = document.getElementById('gLose');
+  [gBgm, gWin, gLose].forEach(function(a){
+    if (!a) return;
+    var fb = a.getAttribute('data-fb');
+    if (!fb) return;
+    a.addEventListener('error', function(){
+      if (a.src.indexOf(fb) < 0){ a.src = fb; }
+    });
+  });
+  function bgmStart(){
+    if (!gBgm) return;
+    gBgm.volume = 0.26;
+    gBgm.currentTime = 0;
+    gBgm.play().catch(function(){});
+  }
+  function bgmResume(){
+    if (!gBgm) return;
+    gBgm.play().catch(function(){});
+  }
+  function bgmPause(){
+    if (!gBgm) return;
+    gBgm.pause();
+  }
+
   var LEVELS = [
     {
       ch:'群里弹出一条消息',
@@ -379,6 +444,32 @@
     sum.classList.remove('hide');
     sum.classList.add('fade');
 
+    var winFlag = (hp >= 60) && (lost < 500);
+
+    bgmPause();
+    /* 胜负音效 */
+    try {
+      var sfx = winFlag ? gWin : gLose;
+      if (sfx){ sfx.currentTime = 0; sfx.volume = 0.92; sfx.play().catch(function(){}); }
+    } catch(e){}
+    sum.classList.toggle('win', winFlag);
+    sum.classList.toggle('lose', !winFlag);
+    document.body.classList.remove('win-flash','lose-flash');
+    void document.body.offsetWidth;
+    document.body.classList.add(winFlag ? 'win-flash' : 'lose-flash');
+
+    /* ---- 判定 ---- */
+    var level, verdict, vdesc, col;
+    if (winFlag){
+      if (hp >= 95 && lost === 0){ level='S'; verdict='完美通关'; vdesc='五关零失误，一分钱都没让它拿走。'; col='#2fd39a'; }
+      else if (hp >= 80){ level='A'; verdict='顺利通关'; vdesc='踩过一点坑，但每次都及时收住了。'; col='#2fd39a'; }
+      else { level='B'; verdict='勉强通关'; vdesc='走到最后了，不过中间有几次差点把持不住。'; col='#ffbf47'; }
+    } else {
+      if (lost >= 2000){ level='F'; verdict='闯关失败 · 损失惨重'; vdesc='这一局丢的钱，够一学期生活费了。真实情况里，一次就够了。'; }
+      else { level='C'; verdict='闯关失败'; vdesc='你在中途被拿下了。骗子最擅长的，就是让你觉得"再试一次就好"。'; }
+      col = '#ff5b5b';
+    }
+
     var saved = Math.max(0, MAX_LOSS - lost);
     var n = 0;
     var el = document.getElementById('savedNum');
@@ -388,19 +479,13 @@
       el.innerHTML = n.toLocaleString('zh-CN') + '<small>元</small>';
     }, 32);
 
-    var g, gd, col;
-    if(hp >= 90)      { g='防骗体质 · 满格'; gd='五关下来几乎没踩坑。你比大多数人都稳。'; col='#2fd39a'; }
-    else if(hp >= 70) { g='基本能扛';       gd='踩过一点坑，但都及时收住了。'; col='#37b6ff'; }
-    else if(hp >= 45) { g='差点栽了';       gd='有一两次差点把持不住——骗子最擅长的就是这个。'; col='#ffbf47'; }
-    else              { g='高危体质';       gd='这一局你损失得很重。真实情况下，一次就够了。'; col='#ff5b5b'; }
-
     var grade = document.getElementById('grade');
-    grade.textContent = g;
+    grade.textContent = level + ' · ' + verdict;
     grade.style.color = col;
     grade.style.background = col + '1f';
     grade.style.border = '1px solid ' + col + '66';
 
-    document.getElementById('gradeDesc').textContent = gd;
+    document.getElementById('gradeDesc').textContent = vdesc;
 
     var rows = '<div class="row"><span>这一局的潜在损失</span><b>' + MAX_LOSS.toLocaleString('zh-CN') + ' 元</b></div>';
     rows += '<div class="row"><span>你实际被骗走</span><b style="color:#ff8b8b">' + lost.toLocaleString('zh-CN') + ' 元</b></div>';
@@ -408,8 +493,31 @@
     rows += '<div class="row"><span>一次选对就躲过的损失</span><b style="color:#7fe3c2">' + saved.toLocaleString('zh-CN') + ' 元</b></div>';
     document.getElementById('rows').innerHTML = rows;
 
-    if(hp >= 70) { beep(660,.14,'sine',.05); setTimeout(function(){beep(880,.2,'sine',.05);},120); }
-    else { beep(200,.3,'sawtooth',.05); }
+    /* ---- 评估分析 ---- */
+    var right = 0, wrongs = [];
+    log.forEach(function(x){
+      if (x.bad) wrongs.push(x); else right++;
+    });
+    var ana = '<h4>你 的 表 现 分 析</h4>';
+    ana += '<div class="ln good"><i>✓</i><div>五关里有 <b>' + right + '</b> 次选对了，' +
+           (wrongs.length ? '有 <b>' + wrongs.length + '</b> 次踩进了坑。' : '一次坑都没踩。') + '</div></div>';
+
+    if (wrongs.length){
+      var worst = wrongs.slice().sort(function(a,b){ return (b.money||0)-(a.money||0); })[0];
+      ana += '<div class="ln bad"><i>!</i><div>损失最重的是<b>第 ' + worst.lv + ' 关</b>' +
+             (worst.money ? '，被骗走 <b>' + worst.money.toLocaleString('zh-CN') + ' 元</b>' : '，差点被带走') + '。</div></div>';
+      var names = wrongs.map(function(x){ return '第 ' + x.lv + ' 关'; }).join('、');
+      ana += '<div class="ln bad"><i>×</i><div>需要重点复盘的：' + names + '。这几次失手有一个共同点——都是对方先给你一点甜头或者一点压力，你就没停下来核实。</div></div>';
+    } else {
+      ana += '<div class="ln good"><i>★</i><div>五个坑你全绕过去了。但记住：真实骗局没有"重来一次"，对方也不会只演五关。</div></div>';
+    }
+
+    if (!winFlag){
+      ana += '<div class="ln"><i>→</i><div>建议：去「骗局闯关」下面的 AI 对话里，把刚才失手的那一类重新演一遍——自己上场当受害者，看看能不能撑住。</div></div>';
+    } else {
+      ana += '<div class="ln"><i>→</i><div>下一步：让 AI 扮成骗子陪你演一场。它会还嘴、会施压，比这五关难得多。</div></div>';
+    }
+    document.getElementById('ana').innerHTML = ana;
 
     window.scrollTo({top:0, behavior:'smooth'});
   }
@@ -419,6 +527,7 @@
     document.getElementById('game').classList.remove('hide');
     document.getElementById('game').classList.add('fade');
     beep(520,.1,'sine',.04);
+    try { bgmStart(); } catch(e){}
     renderLevel();
   });
 
@@ -427,6 +536,9 @@
   document.getElementById('again').addEventListener('click', function(){
     idx = 0; hp = 100; lost = 0; log = [];
     document.getElementById('sum').classList.add('hide');
+    document.getElementById('sum').classList.remove('win','lose');
+    document.body.classList.remove('win-flash','lose-flash');
+    try { bgmResume(); } catch(e){}
     document.getElementById('game').classList.remove('hide');
     renderLevel();
   });
