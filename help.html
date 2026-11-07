@@ -6,102 +6,159 @@
 <title>本校反诈求助卡 | 反诈小安</title>
 <style>
   :root{
-    --bg1:#0b1220; --bg2:#111c33; --card:rgba(255,255,255,.045);
-    --line:rgba(255,255,255,.10); --txt:#e8eefc; --sub:#93a4c3;
-    --brand:#37b6ff; --urgent:#ff6b6b; --ok:#2fd39a; --warn:#ffbf47;
+    --bg1:#080e19;--bg2:#0d1830;--card:rgba(255,255,255,.045);
+    --line:rgba(255,255,255,.10);--txt:#e8eefc;--sub:#93a4c3;
+    --brand:#37b6ff;--ok:#2fd39a;--bad:#ff6b6b;--warn:#ffbf47;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{
     background:
-      radial-gradient(1200px 600px at 50% -10%, #17325e 0%, transparent 60%),
-      linear-gradient(165deg,var(--bg1),var(--bg2) 55%,#0a1018);
-    color:var(--txt);min-height:100vh;padding:22px 16px 44px;
+      radial-gradient(1100px 560px at 50% -12%, #3a1620 0%, transparent 58%),
+      radial-gradient(900px 500px at 90% 20%, #14315c 0%, transparent 60%),
+      linear-gradient(168deg,var(--bg1),var(--bg2) 58%,#070c14);
+    color:var(--txt);min-height:100vh;padding:22px 16px 46px;
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:430px;margin:0 auto}
+  canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75}
+  .wrap{max-width:430px;margin:0 auto;position:relative;z-index:2}
 
-  .head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .rv{opacity:0;transform:translateY(16px);animation:rv .7s cubic-bezier(.2,.8,.2,1) forwards}
+  @keyframes rv{to{opacity:1;transform:none}}
+  .d1{animation-delay:.04s}.d2{animation-delay:.12s}.d3{animation-delay:.2s}
+  .d4{animation-delay:.28s}.d5{animation-delay:.36s}.d6{animation-delay:.44s}
+
+  .head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
   .logo{
     width:38px;height:38px;border-radius:12px;flex:0 0 auto;
-    background:linear-gradient(140deg,#ff6b6b,#c0261f);
-    display:grid;place-items:center;font-size:19px;font-weight:700;
-    box-shadow:0 8px 22px rgba(255,107,107,.26);
+    background:linear-gradient(140deg,#ff8a8a,#c0261f);
+    display:grid;place-items:center;font-size:18px;font-weight:700;
+    box-shadow:0 8px 22px rgba(255,107,107,.3);
   }
-  .head h1{font-size:15.5px;font-weight:600;letter-spacing:.2px}
-  .head p{font-size:11.5px;color:var(--sub);margin-top:2px;letter-spacing:.3px}
+  .head h1{font-size:15px;font-weight:600;letter-spacing:.2px}
+  .head p{font-size:11.5px;color:var(--sub);margin-top:2px}
 
-  .tip{
-    margin:14px 0 16px;padding:11px 13px;border-radius:12px;font-size:12px;line-height:1.7;
-    background:rgba(255,107,107,.09);border:1px solid rgba(255,107,107,.22);color:#ffd7d7;
+  /* 急救条 */
+  .urg{
+    display:flex;gap:11px;align-items:flex-start;
+    padding:14px 15px;border-radius:16px;margin-bottom:16px;
+    background:linear-gradient(140deg,rgba(255,107,107,.16),rgba(255,107,107,.05));
+    border:1px solid rgba(255,107,107,.30);
+    box-shadow:0 10px 30px rgba(255,80,80,.10);
   }
+  .urg .pulse{
+    width:9px;height:9px;border-radius:50%;background:#ff6b6b;flex:0 0 auto;margin-top:5px;
+    box-shadow:0 0 0 0 rgba(255,107,107,.6);animation:pl 1.8s infinite;
+  }
+  @keyframes pl{0%{box-shadow:0 0 0 0 rgba(255,107,107,.55)}70%{box-shadow:0 0 0 10px rgba(255,107,107,0)}100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}}
+  .urg div{font-size:12.5px;line-height:1.8;color:#ffd9d9}
+  .urg b{color:#fff}
 
   /* 校区切换 */
-  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tabs{display:flex;gap:8px;margin-bottom:14px;position:relative}
   .tab{
     flex:1;padding:11px;border-radius:12px;text-align:center;font-size:13px;font-weight:600;
     background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--sub);
-    cursor:pointer;transition:.2s;user-select:none;
+    cursor:pointer;transition:.22s;user-select:none;
   }
-  .tab.on{background:linear-gradient(140deg,#37b6ff,#1a6fd4);border-color:transparent;color:#fff;
-          box-shadow:0 8px 20px rgba(55,182,255,.24)}
+  .tab.on{
+    background:linear-gradient(140deg,#37b6ff,#1a6fd4);border-color:transparent;color:#fff;
+    box-shadow:0 8px 22px rgba(55,182,255,.26);
+  }
 
   .card{
     background:var(--card);border:1px solid var(--line);border-radius:18px;
     padding:16px 15px;margin-bottom:12px;backdrop-filter:blur(12px);
+    position:relative;overflow:hidden;transition:.25s;
   }
-  .card.urgent{border-color:rgba(255,107,107,.28);background:rgba(255,107,107,.06)}
+  .card::after{
+    content:"";position:absolute;right:-36px;top:-36px;width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle,rgba(55,182,255,.14),transparent 70%);pointer-events:none;
+  }
+  .card.urgent{border-color:rgba(255,107,107,.30);background:rgba(255,107,107,.06)}
+  .card.urgent::after{background:radial-gradient(circle,rgba(255,107,107,.22),transparent 70%)}
   .card.soft{border-color:rgba(55,182,255,.20);background:rgba(55,182,255,.05)}
+  .card:hover{transform:translateY(-2px)}
 
-  .row{display:flex;align-items:flex-start;gap:12px}
+  .row{display:flex;align-items:flex-start;gap:12px;position:relative;z-index:1}
   .ico{
-    width:38px;height:38px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
-    background:rgba(255,255,255,.06);font-size:17px;
+    width:40px;height:40px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
+    background:rgba(255,255,255,.06);font-size:18px;
   }
+  .card.urgent .ico{background:rgba(255,107,107,.16)}
   .info{flex:1;min-width:0}
-  .info .lab{font-size:11px;color:var(--sub);letter-spacing:.6px;margin-bottom:3px}
-  .info .name{font-size:14.5px;font-weight:600;margin-bottom:4px}
-  .info .addr{font-size:12px;color:var(--sub);line-height:1.6}
+  .info .lab{font-size:10.5px;color:var(--sub);letter-spacing:.8px;margin-bottom:4px}
+  .info .name{font-size:15px;font-weight:700;margin-bottom:5px;letter-spacing:.2px}
+  .info .addr{font-size:12px;color:var(--sub);line-height:1.7}
   .info .addr b{color:#cfdcf4;font-weight:500}
 
   .call{
-    display:flex;align-items:center;justify-content:center;gap:6px;
-    margin-top:12px;padding:12px;border-radius:12px;text-decoration:none;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    margin-top:13px;padding:13px;border-radius:13px;text-decoration:none;
     background:linear-gradient(140deg,#37b6ff,#1a6fd4);color:#fff;
-    font-size:15px;font-weight:700;letter-spacing:1px;
-    box-shadow:0 8px 20px rgba(55,182,255,.22);
+    font-size:16px;font-weight:800;letter-spacing:1.2px;
+    box-shadow:0 10px 24px rgba(55,182,255,.24);
+    position:relative;z-index:1;transition:.2s;
+    font-variant-numeric:tabular-nums;
   }
-  .card.urgent .call{background:linear-gradient(140deg,#ff6b6b,#c0261f);box-shadow:0 8px 20px rgba(255,107,107,.22)}
-  .call:active{transform:scale(.985)}
-  .call small{font-size:11px;font-weight:500;opacity:.8;letter-spacing:0}
+  .call:active{transform:scale(.98)}
+  .call small{font-size:10.5px;font-weight:500;opacity:.85;letter-spacing:0}
+  .card.urgent .call{
+    background:linear-gradient(140deg,#ff7a7a,#c0261f);
+    box-shadow:0 10px 24px rgba(255,107,107,.26);
+    animation:urgpulse 2.6s ease-in-out infinite;
+  }
+  @keyframes urgpulse{0%,100%{box-shadow:0 10px 24px rgba(255,107,107,.20)}50%{box-shadow:0 10px 32px rgba(255,107,107,.42)}}
 
   .t{display:flex;align-items:center;gap:8px;margin:24px 0 12px}
   .t::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--brand)}
   .t span{font-size:13.5px;font-weight:600;letter-spacing:.4px}
 
-  .check{display:grid;gap:9px}
-  .ck{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.65;color:#cfdcf4}
+  .check{display:grid;gap:10px}
+  .ck{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.7;color:#cfdcf4;opacity:0;animation:rv .5s ease forwards}
   .ck i{
-    width:16px;height:16px;border-radius:5px;flex:0 0 auto;margin-top:1px;
+    width:17px;height:17px;border-radius:5px;flex:0 0 auto;margin-top:1px;
     border:1.5px solid rgba(55,182,255,.5);background:rgba(55,182,255,.12);
     display:grid;place-items:center;font-size:10px;color:var(--brand);font-style:normal;
   }
 
-  .myth{display:grid;gap:12px}
-  .mi{padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
-  .mi .bad{font-size:12px;color:#ff9b9b;line-height:1.6;margin-bottom:5px}
-  .mi .good{font-size:12.5px;color:#d7e5ff;line-height:1.7}
+  .myth{display:grid;gap:11px}
+  .mi{padding:13px 14px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .mi .bad{font-size:12px;color:#ff9b9b;line-height:1.65;margin-bottom:6px}
+  .mi .good{font-size:12.5px;color:#d7e5ff;line-height:1.75}
   .mi .good b{color:var(--ok)}
+
+  .hotline{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;
+  }
+  .hl{
+    display:block;padding:15px 13px;border-radius:14px;text-decoration:none;color:inherit;
+    background:rgba(55,182,255,.07);border:1px solid rgba(55,182,255,.20);
+    transition:.2s;
+  }
+  .hl:hover{border-color:rgba(55,182,255,.5);transform:translateY(-2px)}
+  .hl b{display:block;font-size:19px;font-weight:800;color:#8fd4ff;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+  .hl span{display:block;font-size:10.5px;color:var(--sub);margin-top:4px}
 
   .foot{text-align:center;font-size:11px;color:#64748b;line-height:1.9;margin-top:20px}
   .foot .hr{height:1px;background:var(--line);margin:16px 0}
   .hide{display:none}
+
+  .pgt{position:fixed;right:16px;bottom:18px;z-index:60;width:42px;height:42px;border-radius:50%;
+    border:1px solid rgba(55,182,255,.3);background:rgba(10,20,34,.86);color:#8fc6ff;
+    font-size:16px;cursor:pointer;display:grid;place-items:center;
+    box-shadow:0 8px 22px rgba(0,0,0,.4);transition:.2s;backdrop-filter:blur(8px)}
+  .pgt:hover{border-color:rgba(55,182,255,.7)}
+  .pgt.off{color:#4d6a8c;border-color:rgba(255,255,255,.1)}
+
+  @media (min-width:760px){ body{padding:40px 24px 64px} .wrap{max-width:560px} .card{padding:20px 22px} }
 </style>
 </head>
 <body>
+<canvas id="bg"></canvas>
 <div class="wrap">
 
-  <div class="head">
+  <div class="head rv d1">
     <div class="logo">急</div>
     <div>
       <h1>内蒙古师范大学 · 反诈求助卡</h1>
@@ -109,33 +166,34 @@
     </div>
   </div>
 
-  <div class="tip">
-    <b>已经转账了？先做三件事：</b>① 停止一切转账　② 截图保存聊天和转账记录（别删）　③ 打电话报警或直接去派出所
+  <div class="urg rv d1">
+    <span class="pulse"></span>
+    <div>
+      <b>已经转账了？先做三件事：</b><br>
+      ① 停止一切转账　② 截图保存聊天和转账记录（别删）　③ 打电话报警或直接去派出所
+    </div>
   </div>
 
-  <div class="tabs">
+  <div class="tabs rv d2">
     <div class="tab on" data-campus="saihan">赛罕校区</div>
     <div class="tab" data-campus="shengle">盛乐校区</div>
   </div>
 
-  <!-- ===== 赛罕 ===== -->
+  <!-- 赛罕 -->
   <div id="saihan">
-    <div class="card urgent">
+    <div class="card urgent rv d2">
       <div class="row">
         <div class="ico">🚔</div>
         <div class="info">
           <div class="lab">辖区派出所 · 报案去这里</div>
           <div class="name">大学西路派出所</div>
-          <div class="addr">
-            赛罕区新建西街 5 号（学校北门斜对面）<br>
-            <b>从北门出去，步行约 5 分钟</b>
-          </div>
+          <div class="addr">赛罕区新建西街 5 号（学校北门斜对面）<br><b>从北门出去，步行约 5 分钟</b></div>
         </div>
       </div>
       <a class="call" href="tel:04714964903">📞 0471-4964903 <small>点击拨打</small></a>
     </div>
 
-    <div class="card">
+    <div class="card rv d3">
       <div class="row">
         <div class="ico">🛡️</div>
         <div class="info">
@@ -147,7 +205,7 @@
       <a class="call" href="tel:04714392110">📞 0471-4392110 <small>点击拨打</small></a>
     </div>
 
-    <div class="card">
+    <div class="card rv d4">
       <div class="row">
         <div class="ico">👮</div>
         <div class="info">
@@ -156,40 +214,37 @@
           <div class="addr">在校内遇到紧急情况，可直接联系</div>
         </div>
       </div>
-      <a class="call" href="tel:13347148110">📞 13347148110 <small>点击拨打</small></a>
+      <a class="call" href="tel:13347148110">📞 133-4714-8110 <small>点击拨打</small></a>
     </div>
 
-    <div class="card">
+    <div class="card rv d5">
       <div class="row">
         <div class="ico">💬</div>
         <div class="info">
           <div class="lab">心理健康教育中心</div>
           <div class="name">悦心空间</div>
-          <div class="addr">学生公寓 8 号楼“一站式”学生社区北侧<br>企业微信 → 工作台 → 学工服务 → 心理健康</div>
+          <div class="addr">学生公寓 8 号楼「一站式」学生社区北侧<br>企业微信 → 工作台 → 学工服务 → 心理健康</div>
         </div>
       </div>
       <a class="call" href="tel:04717388380">📞 0471-7388380 <small>点击拨打</small></a>
     </div>
   </div>
 
-  <!-- ===== 盛乐 ===== -->
+  <!-- 盛乐 -->
   <div id="shengle" class="hide">
-    <div class="card urgent">
+    <div class="card urgent rv d2">
       <div class="row">
         <div class="ico">🚔</div>
         <div class="info">
           <div class="lab">辖区派出所 · 报案去这里</div>
           <div class="name">盛乐派出所</div>
-          <div class="addr">
-            学校东门正南方向约 90 米<br>
-            <b>从东门出去，步行约 10 分钟</b>
-          </div>
+          <div class="addr">学校东门正南方向约 90 米<br><b>从东门出去，步行约 10 分钟</b></div>
         </div>
       </div>
       <a class="call" href="tel:04717390280">📞 0471-7390280 <small>点击拨打</small></a>
     </div>
 
-    <div class="card">
+    <div class="card rv d3">
       <div class="row">
         <div class="ico">🛡️</div>
         <div class="info">
@@ -201,7 +256,7 @@
       <a class="call" href="tel:04717384110">📞 0471-7384110 <small>点击拨打</small></a>
     </div>
 
-    <div class="card">
+    <div class="card rv d4">
       <div class="row">
         <div class="ico">👮</div>
         <div class="info">
@@ -210,10 +265,10 @@
           <div class="addr">在校内遇到紧急情况，可直接联系</div>
         </div>
       </div>
-      <a class="call" href="tel:13847132888">📞 13847132888 <small>点击拨打</small></a>
+      <a class="call" href="tel:13847132888">📞 138-4713-2888 <small>点击拨打</small></a>
     </div>
 
-    <div class="card">
+    <div class="card rv d5">
       <div class="row">
         <div class="ico">🏢</div>
         <div class="info">
@@ -225,7 +280,7 @@
       <a class="call" href="tel:04717388385">📞 0471-7388385 <small>点击拨打</small></a>
     </div>
 
-    <div class="card">
+    <div class="card rv d6">
       <div class="row">
         <div class="ico">💬</div>
         <div class="info">
@@ -238,14 +293,13 @@
     </div>
   </div>
 
-  <!-- 通用 -->
-  <div class="t"><span>报案带什么（缺一样会多跑一趟）</span></div>
-  <div class="card">
+  <div class="t rv d6"><span>报案带什么（缺一样会多跑一趟）</span></div>
+  <div class="card rv d6">
     <div class="check">
-      <div class="ck"><i>✓</i><div>本人身份证</div></div>
-      <div class="ck"><i>✓</i><div>转账记录完整截图（金额、时间、收款方）</div></div>
-      <div class="ck"><i>✓</i><div>聊天记录完整截图，一条都别删</div></div>
-      <div class="ck"><i>✓</i><div>对方的账号、收款码、电话、网址</div></div>
+      <div class="ck" style="animation-delay:.5s"><i>✓</i><div>本人身份证</div></div>
+      <div class="ck" style="animation-delay:.58s"><i>✓</i><div>转账记录完整截图（金额、时间、收款方）</div></div>
+      <div class="ck" style="animation-delay:.66s"><i>✓</i><div>聊天记录完整截图，一条都别删</div></div>
+      <div class="ck" style="animation-delay:.74s"><i>✓</i><div>对方的账号、收款码、电话、网址</div></div>
     </div>
   </div>
 
@@ -265,11 +319,10 @@
     </div>
   </div>
 
-  <div class="card soft" style="margin-top:14px">
-    <div class="rule" style="font-size:12.5px;line-height:1.85;color:#d7e5ff">
-      拿不准就打 <b style="color:#37b6ff">96110</b> 反诈专线；<br>
-      法律问题打 <b style="color:#37b6ff">12348</b> 公共法律服务热线。
-    </div>
+  <div class="t"><span>两个一定要记住的号码</span></div>
+  <div class="hotline">
+    <a class="hl" href="tel:96110"><b>96110</b><span>全国反诈预警专线</span></a>
+    <a class="hl" href="tel:12348"><b>12348</b><span>公共法律服务</span></a>
   </div>
 
   <div class="foot">
@@ -279,7 +332,36 @@
   </div>
 </div>
 
+<audio id="pBgm" src="audio/help_bgm.mp3" loop preload="none"></audio>
+<button class="pgt off" id="pBgmBtn" aria-label="音乐开关">♪</button>
+
 <script>
+(function(){
+  // 粒子背景
+  var cv = document.getElementById('bg');
+  if (cv){
+    var ctx = cv.getContext('2d'), W, H, pts = [], dpr = Math.min(2, devicePixelRatio || 1);
+    function size(){ W = cv.width = innerWidth*dpr; H = cv.height = innerHeight*dpr;
+      cv.style.width = innerWidth+'px'; cv.style.height = innerHeight+'px'; }
+    size(); addEventListener('resize', size);
+    var N = Math.min(38, Math.round(innerWidth/30));
+    for (var i=0;i<N;i++) pts.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*0.0004,vy:(Math.random()-.5)*0.0004});
+    (function draw(){
+      ctx.clearRect(0,0,W,H);
+      var P = pts.map(function(p){ return {x:p.x*W,y:p.y*H}; });
+      var lim = 140*dpr;
+      for (var i=0;i<P.length;i++) for (var j=i+1;j<P.length;j++){
+        var dx=P[i].x-P[j].x, dy=P[i].y-P[j].y, d=Math.hypot(dx,dy);
+        if (d<lim){ ctx.strokeStyle='rgba(255,120,120,'+(0.14*(1-d/lim)).toFixed(3)+')';
+          ctx.lineWidth=dpr; ctx.beginPath(); ctx.moveTo(P[i].x,P[i].y); ctx.lineTo(P[j].x,P[j].y); ctx.stroke(); }
+      }
+      P.forEach(function(p){ ctx.fillStyle='rgba(255,150,150,.45)'; ctx.beginPath(); ctx.arc(p.x,p.y,1.6*dpr,0,7); ctx.fill(); });
+      pts.forEach(function(p){ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>1)p.vx*=-1; if(p.y<0||p.y>1)p.vy*=-1; });
+      requestAnimationFrame(draw);
+    })();
+  }
+
+  // 校区切换
   document.querySelectorAll('.tab').forEach(function(t){
     t.addEventListener('click', function(){
       document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('on'); });
@@ -287,9 +369,21 @@
       var c = t.dataset.campus;
       document.getElementById('saihan').classList.toggle('hide', c !== 'saihan');
       document.getElementById('shengle').classList.toggle('hide', c !== 'shengle');
-      window.scrollTo({top:0, behavior:'smooth'});
     });
   });
+
+  // 音乐
+  var a = document.getElementById('pBgm'), b = document.getElementById('pBgmBtn');
+  if (a && b){
+    a.volume = 0.34;
+    function ui(){ b.classList.toggle('off', a.paused); }
+    function start(){ a.play().then(ui).catch(ui); }
+    start();
+    document.addEventListener('pointerdown', function once(){ if(a.paused) start(); document.removeEventListener('pointerdown', once); }, {passive:true});
+    b.addEventListener('click', function(e){ e.stopPropagation(); if(a.paused) start(); else { a.pause(); ui(); } });
+    a.addEventListener('play', ui); a.addEventListener('pause', ui); ui();
+  }
+})();
 </script>
 </body>
 </html>
