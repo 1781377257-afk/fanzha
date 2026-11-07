@@ -6,20 +6,27 @@
 <title>我的防骗体检报告 | 反诈小安</title>
 <style>
   :root{
-    --bg1:#0b1220; --bg2:#111c33; --card:rgba(255,255,255,.045);
+    --bg1:#080e19; --bg2:#0d1830; --card:rgba(255,255,255,.045);
     --line:rgba(255,255,255,.10); --txt:#e8eefc; --sub:#93a4c3;
-    --brand:#37b6ff; --good:#2fd39a; --warn:#ffbf47; --bad:#ff6b6b;
+    --brand:#37b6ff; --good:#2fd39a; --warn:#ffbf47; --bad:#ff6b6b; --purple:#a78bfa;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{
     background:
-      radial-gradient(1200px 600px at 50% -10%, #14315c 0%, transparent 60%),
-      linear-gradient(165deg,var(--bg1),var(--bg2) 55%,#0a1018);
-    color:var(--txt);min-height:100vh;padding:22px 16px 44px;
+      radial-gradient(1200px 620px at 50% -12%, #14315c 0%, transparent 62%),
+      linear-gradient(168deg,var(--bg1),var(--bg2) 58%,#070c14);
+    color:var(--txt);min-height:100vh;padding:22px 16px 46px;
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-    -webkit-font-smoothing:antialiased;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
   }
-  .wrap{max-width:430px;margin:0 auto}
+  canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.85}
+  .wrap{max-width:440px;margin:0 auto;position:relative;z-index:2}
+
+  /* 入场 */
+  .rv{opacity:0;transform:translateY(18px);animation:rv .8s cubic-bezier(.2,.8,.2,1) forwards}
+  @keyframes rv{to{opacity:1;transform:none}}
+  .d1{animation-delay:.05s}.d2{animation-delay:.14s}.d3{animation-delay:.23s}
+  .d4{animation-delay:.32s}.d5{animation-delay:.41s}.d6{animation-delay:.5s}
 
   /* 头部 */
   .head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
@@ -32,62 +39,100 @@
   .head h1{font-size:15px;font-weight:600;letter-spacing:.2px}
   .head p{font-size:11.5px;color:var(--sub);margin-top:2px;letter-spacing:.3px}
 
-  /* 总卡 */
   .card{
     background:var(--card);border:1px solid var(--line);border-radius:20px;
     padding:22px 20px;backdrop-filter:blur(12px);margin-bottom:14px;
+    position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;
+    background:radial-gradient(circle,rgba(55,182,255,.16),transparent 70%);pointer-events:none;
   }
 
-  /* 分数环 */
-  .scorebox{display:flex;align-items:center;gap:20px}
-  .ring{position:relative;width:118px;height:118px;flex:0 0 auto}
+  /* 分数区 */
+  .scorebox{display:flex;align-items:center;gap:18px}
+  .ring{position:relative;width:124px;height:124px;flex:0 0 auto}
   .ring svg{transform:rotate(-90deg);display:block}
-  .ring .num{
-    position:absolute;inset:0;display:grid;place-content:center;text-align:center;
+  .ring .halo{
+    position:absolute;inset:-6px;border-radius:50%;
+    box-shadow:0 0 26px rgba(47,211,154,.28);
+    animation:halo 3s ease-in-out infinite;
   }
-  .ring .num b{font-size:38px;font-weight:800;line-height:1;letter-spacing:-1px}
-  .ring .num span{display:block;font-size:11px;color:var(--sub);margin-top:5px;letter-spacing:2px}
-  .scorebox .meta h2{font-size:17px;font-weight:700;margin-bottom:6px}
-  .scorebox .meta p{font-size:12.5px;color:var(--sub);line-height:1.7}
+  @keyframes halo{0%,100%{opacity:.45;transform:scale(.98)}50%{opacity:1;transform:scale(1.02)}}
+  .ring .num{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+  .ring .num b{font-size:40px;font-weight:800;line-height:1;letter-spacing:-1.5px;font-variant-numeric:tabular-nums}
+  .ring .num span{display:block;font-size:11px;color:var(--sub);margin-top:5px;letter-spacing:3px}
+  .scorebox .meta h2{font-size:17.5px;font-weight:800;margin-bottom:6px;letter-spacing:.3px}
+  .scorebox .meta p{font-size:12.5px;color:var(--sub);line-height:1.75}
   .badge{
-    display:inline-block;margin-top:9px;padding:4px 11px;border-radius:999px;
+    display:inline-block;margin-top:10px;padding:5px 12px;border-radius:999px;
     font-size:11.5px;font-weight:600;letter-spacing:.5px;
   }
 
-  /* 标题行 */
+  /* 标题 */
   .t{display:flex;align-items:center;gap:8px;margin-bottom:16px}
   .t::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--brand)}
   .t span{font-size:13.5px;font-weight:600;letter-spacing:.4px}
+  .t em{font-style:normal;margin-left:auto;font-size:10.5px;color:#64748b;letter-spacing:.5px}
 
-  /* 雷达图 */
-  .radar{display:grid;place-items:center;padding:4px 0 2px}
-  .legend{margin-top:12px;display:grid;gap:9px}
+  /* 概览三格 */
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .g3{
+    background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);
+    border-radius:13px;padding:12px 10px;text-align:center;
+  }
+  .g3 b{display:block;font-size:15px;font-weight:800;letter-spacing:.2px}
+  .g3 span{display:block;font-size:10.5px;color:var(--sub);margin-top:5px;letter-spacing:.5px}
+  .g3 small{display:block;font-size:9.5px;color:#5b7191;margin-top:3px}
+
+  /* 雷达 */
+  .radar{display:grid;place-items:center;padding:2px 0}
+  .legend{margin-top:10px;display:grid;gap:11px}
   .lg{display:flex;align-items:center;gap:10px;font-size:12.5px}
-  .lg i{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
-  .lg .n{color:var(--sub);flex:1}
-  .lg .v{font-variant-numeric:tabular-nums;font-weight:700;font-size:12.5px}
-  .lg .bar{flex:0 0 64px;height:4px;border-radius:2px;background:rgba(255,255,255,.10);overflow:hidden}
-  .lg .bar>i{display:block;height:100%;border-radius:2px;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+  .lg i.d{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  .lg .n{color:var(--sub);flex:0 0 62px}
+  .lg .bar{flex:1 1 auto;height:5px;border-radius:3px;background:rgba(255,255,255,.09);overflow:hidden}
+  .lg .bar>i{display:block;height:100%;border-radius:3px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+  .lg .v{font-variant-numeric:tabular-nums;font-weight:700;font-size:12.5px;flex:0 0 auto;min-width:40px;text-align:right}
+  .read{margin-top:12px;display:grid;gap:8px}
+  .read div{font-size:11.5px;line-height:1.75;color:#9fb2cd;padding-left:12px;position:relative}
+  .read div::before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:#3d5b82}
 
   /* 五阶 */
-  .steps{display:flex;flex-direction:column;gap:8px}
-  .st{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--sub)}
+  .steps{display:flex;flex-direction:column;gap:9px}
+  .st{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--sub);opacity:0;animation:rv .5s ease forwards}
   .st .dot{
-    width:20px;height:20px;border-radius:50%;flex:0 0 auto;
+    width:22px;height:22px;border-radius:50%;flex:0 0 auto;
     border:1.5px solid var(--line);display:grid;place-items:center;
-    font-size:10px;color:var(--sub);
+    font-size:10.5px;color:var(--sub);transition:.3s;
   }
-  .st.done .dot{background:rgba(47,211,154,.16);border-color:rgba(47,211,154,.5);color:var(--good)}
-  .st.stop .dot{background:rgba(255,107,107,.16);border-color:rgba(255,107,107,.55);color:var(--bad)}
+  .st.done .dot{background:rgba(47,211,154,.16);border-color:rgba(47,211,154,.55);color:var(--good)}
+  .st.stop .dot{background:rgba(255,107,107,.18);border-color:rgba(255,107,107,.6);color:var(--bad);box-shadow:0 0 0 4px rgba(255,107,107,.08)}
   .st.cur{color:var(--txt);font-weight:600}
-  .st>span:nth-child(2){
-    flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
+  .st>span:nth-child(2){flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .st .tag{
-    flex:0 0 auto;margin-left:8px;font-size:10.5px;padding:2px 8px;border-radius:999px;
+    flex:0 0 auto;font-size:10px;padding:2px 8px;border-radius:999px;
     background:rgba(255,255,255,.06);color:var(--sub);white-space:nowrap;
   }
-  .st.stop .tag{background:rgba(255,107,107,.14);color:var(--bad)}
+  .st.done .tag{background:rgba(47,211,154,.12);color:var(--good)}
+  .st.stop .tag{background:rgba(255,107,107,.16);color:var(--bad)}
+
+  /* 下一阶提示 */
+  .next{
+    margin-top:14px;padding:13px 14px;border-radius:13px;
+    background:rgba(255,191,71,.07);border:1px solid rgba(255,191,71,.20);
+    font-size:12px;line-height:1.8;color:#e2d3b0;
+  }
+  .next b{color:var(--warn)}
+
+  /* 高危话术 */
+  .quote{
+    font-size:13.5px;line-height:1.85;color:#ffd9d9;
+    background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.22);
+    border-radius:13px;padding:14px 15px;font-style:italic;
+  }
+  .quote::before{content:"「";color:rgba(255,107,107,.6)}
+  .quote::after{content:"」";color:rgba(255,107,107,.6)}
 
   /* 三句 */
   .rules{display:grid;gap:10px}
@@ -98,36 +143,50 @@
   }
   .rl b{color:var(--brand);font-size:11px;flex:0 0 auto;margin-top:1px}
 
-  /* 点评 */
-  .note{font-size:13px;line-height:1.85;color:#cfdcf4}
+  /* 下一步 */
+  .todo{display:grid;gap:9px}
+  .td{display:flex;gap:10px;font-size:12.5px;line-height:1.7;color:#cfdcf4}
+  .td i{
+    width:18px;height:18px;border-radius:6px;flex:0 0 auto;display:grid;place-items:center;
+    font-size:10px;font-style:normal;background:rgba(47,211,154,.14);color:var(--good);margin-top:1px;
+  }
+
+  .note{font-size:13px;line-height:1.9;color:#cfdcf4}
   .note strong{color:var(--warn);font-weight:600}
 
-  /* 底部 */
   .foot{text-align:center;font-size:11px;color:#64748b;line-height:1.9;margin-top:6px}
   .foot .hr{height:1px;background:var(--line);margin:14px 0}
 
+  .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
   .btn{
     display:block;width:100%;padding:13px;border-radius:13px;border:none;cursor:pointer;
     background:linear-gradient(140deg,#37b6ff,#1a6fd4);color:#fff;
-    font-size:14px;font-weight:600;letter-spacing:.5px;
-    box-shadow:0 10px 26px rgba(55,182,255,.26);
-    font-family:inherit;
+    font-size:13.5px;font-weight:600;letter-spacing:.5px;
+    box-shadow:0 10px 26px rgba(55,182,255,.24);font-family:inherit;
   }
+  .btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);box-shadow:none;color:#cfe0f5}
   .btn:active{transform:scale(.985)}
-  .hint{text-align:center;font-size:11px;color:#64748b;margin-top:10px;line-height:1.7}
+  .hint{text-align:center;font-size:11px;color:#64748b;margin-top:10px;line-height:1.7;min-height:16px}
 
-  /* 桌面端适度加宽，避免投屏时两侧大片空白 */
-  @media (min-width: 760px){
-    body{padding:40px 24px 60px}
-    .wrap{max-width:520px}
+  @media (min-width:760px){
+    body{padding:40px 24px 64px}
+    .wrap{max-width:560px}
     .card{padding:24px 26px}
+  }
+  @media print{
+    body{background:#fff;color:#111}
+    canvas#bg,.btnrow,.pgt{display:none!important}
+    .card{background:#fff;border-color:#ddd;break-inside:avoid}
+    .note,.lg .n,.st{color:#333}
   }
 </style>
 </head>
 <body>
+<canvas id="bg"></canvas>
+
 <div class="wrap">
 
-  <div class="head">
+  <div class="head rv d1">
     <div class="logo">安</div>
     <div>
       <h1>内蒙古师范大学 · 校园反诈服务台</h1>
@@ -136,15 +195,16 @@
   </div>
 
   <!-- 总分 -->
-  <div class="card">
+  <div class="card rv d2">
     <div class="scorebox">
       <div class="ring">
-        <svg width="118" height="118">
-          <circle cx="59" cy="59" r="49" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/>
-          <circle id="arc" cx="59" cy="59" r="49" fill="none"
+        <div class="halo" id="halo"></div>
+        <svg width="124" height="124">
+          <circle cx="62" cy="62" r="51" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/>
+          <circle id="arc" cx="62" cy="62" r="51" fill="none"
                   stroke="url(#g1)" stroke-width="9" stroke-linecap="round"
-                  stroke-dasharray="307.9" stroke-dashoffset="307.9"
-                  style="transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)"/>
+                  stroke-dasharray="320.4" stroke-dashoffset="320.4"
+                  style="transition:stroke-dashoffset 1.3s cubic-bezier(.2,.8,.2,1)"/>
           <defs>
             <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="#2fd39a"/>
@@ -152,7 +212,7 @@
             </linearGradient>
           </defs>
         </svg>
-        <div class="num"><b id="scoreTxt">--</b><span>分</span></div>
+        <div class="num"><b id="scoreTxt">0</b><span>分</span></div>
       </div>
       <div class="meta">
         <h2 id="grade">正在读取…</h2>
@@ -162,23 +222,40 @@
     </div>
   </div>
 
-  <!-- 雷达 -->
-  <div class="card">
-    <div class="t"><span>四个维度</span></div>
-    <div class="radar">
-      <svg id="radar" width="290" height="240" viewBox="0 0 290 240"></svg>
+  <!-- 概览 -->
+  <div class="card rv d3">
+    <div class="t"><span>本次演练</span><em id="dateTxt">—</em></div>
+    <div class="grid3">
+      <div class="g3"><b id="kType">—</b><span>骗局类型</span></div>
+      <div class="g3"><b id="kStage">—</b><span>停在第几阶</span><small>共五阶</small></div>
+      <div class="g3"><b id="kHeld">—</b><span>你守住了</span><small>预估</small></div>
     </div>
+  </div>
+
+  <!-- 雷达 -->
+  <div class="card rv d4">
+    <div class="t"><span>四个维度</span><em>满分 100</em></div>
+    <div class="radar"><svg id="radar" width="300" height="250" viewBox="0 0 300 250"></svg></div>
     <div class="legend" id="legend"></div>
+    <div class="read" id="read"></div>
   </div>
 
   <!-- 五阶 -->
-  <div class="card">
-    <div class="t"><span>你在第几阶停下的</span></div>
+  <div class="card rv d5">
+    <div class="t"><span>你在第几阶停下的</span><em>骗子的推进节奏</em></div>
     <div class="steps" id="steps"></div>
+    <div class="next" id="nextTip"></div>
+  </div>
+
+  <!-- 高危话术 -->
+  <div class="card rv d5">
+    <div class="t"><span>这次最危险的一句话</span></div>
+    <div class="quote" id="dangerQuote">—</div>
+    <p class="note" id="dangerWhy" style="margin-top:12px">—</p>
   </div>
 
   <!-- 三句 -->
-  <div class="card">
+  <div class="card rv d6">
     <div class="t"><span>带走这三句</span></div>
     <div class="rules">
       <div class="rl"><b>1</b><div>凡是<b style="color:#fff">先交钱</b>的，都是骗。</div></div>
@@ -187,50 +264,115 @@
     </div>
   </div>
 
+  <!-- 下一步 -->
+  <div class="card rv d6">
+    <div class="t"><span>接下来做这三件事</span></div>
+    <div class="todo" id="todo"></div>
+  </div>
+
   <!-- 点评 -->
-  <div class="card">
+  <div class="card rv d6">
     <div class="t"><span>一句话点评</span></div>
     <p class="note" id="comment">—</p>
   </div>
 
-  <button class="btn" onclick="shareTip()">保存这张报告</button>
-  <p class="hint" id="shareHint">截图保存，或者长按页面选择「保存图片」</p>
+  <div class="btnrow rv d6">
+    <button class="btn" onclick="window.print()">保存 / 打印</button>
+    <button class="btn ghost" onclick="location.href='index.html'">回到首页</button>
+  </div>
+  <p class="hint" id="shareHint">手机可截图保存，电脑可打印成 PDF</p>
 
   <div class="foot">
     <div class="hr"></div>
     内蒙古师范大学 · 反诈小安 校园反诈服务台<br>
-    <span id="dateTxt"></span> · 本报告基于本次演练表现生成
+    本报告基于本次演练表现生成，仅供参考，不构成法律意见
   </div>
 </div>
 
+<audio id="pBgm" src="audio/shedalight.mp3" loop preload="none"></audio>
+<button class="pgt off" id="pBgmBtn" aria-label="音乐开关">♪</button>
+<style>
+.pgt{position:fixed;right:16px;bottom:18px;z-index:60;width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(55,182,255,.3);background:rgba(10,20,34,.86);color:#8fc6ff;
+  font-size:16px;cursor:pointer;display:grid;place-items:center;
+  box-shadow:0 8px 22px rgba(0,0,0,.4);transition:.2s;backdrop-filter:blur(8px)}
+.pgt:hover{border-color:rgba(55,182,255,.7)}
+.pgt.off{color:#4d6a8c;border-color:rgba(255,255,255,.1)}
+</style>
+
 <script>
 (function(){
-  // ---------- 读取参数 ----------
+  // ============ 读取参数 ============
   var q = new URLSearchParams(location.search);
   function num(k, d){ var v = parseFloat(q.get(k)); return isFinite(v) ? v : d; }
-
-  var t1 = Math.max(0, Math.min(40, num('t1', 30)));  // 识破时机
-  var t2 = Math.max(0, Math.min(25, num('t2', 20)));  // 质疑质量
-  var t3 = Math.max(0, Math.min(20, num('t3', 20)));  // 信息保护
-  var t4 = Math.max(0, Math.min(15, num('t4', 8)));   // 应对动作
-  var stage = Math.max(1, Math.min(5, Math.round(num('s', 3)))); // 停在第几阶
-  var type  = q.get('type') || '刷单兼职';
-  var cmt   = q.get('c') || '你问到了关键的地方，但对方一句“名额就一个”就把你带回来了——下次问出破绽后，直接停下来去核实。';
+  // 短参数支持：?a=32-20-21-8&s=3&t=2
+  var TYPE_LIST = ['冒充老师收费','冒充公检法','客服退款','刷单返利','兼职押金','借卡走账','网恋杀猪盘','机票退改签'];
+  var aRaw = q.get('a') || '';
+  var aParts = aRaw.split('-').map(function(x){ return parseFloat(x); });
+  function pick(idx, key, dft){
+    var v = isFinite(aParts[idx]) ? aParts[idx] : num(key, dft);
+    return v;
+  }
+  var t1 = Math.max(0, Math.min(40, pick(0, 't1', 30)));
+  var t2 = Math.max(0, Math.min(25, pick(1, 't2', 20)));
+  var t3 = Math.max(0, Math.min(20, pick(2, 't3', 20)));
+  var t4 = Math.max(0, Math.min(15, pick(3, 't4', 8)));
+  var stage = Math.max(1, Math.min(5, Math.round(num('s', 3))));
+  var tIdx = q.get('t');
+  var type  = q.get('type') || (tIdx !== null && TYPE_LIST[parseInt(tIdx,10)] ? TYPE_LIST[parseInt(tIdx,10)] : '刷单兼职');
+  var cmt   = q.get('c') || '';
   var score = Math.round(t1 + t2 + t3 + t4);
 
-  // ---------- 总分 ----------
-  document.getElementById('scoreTxt').textContent = score;
-  var arc = document.getElementById('arc'), C = 2 * Math.PI * 49;
+  // ============ 背景粒子 ============
+  (function(){
+    var cv = document.getElementById('bg'), ctx = cv.getContext('2d');
+    var W, H, pts = [];
+    function size(){ W = cv.width = innerWidth * devicePixelRatio; H = cv.height = innerHeight * devicePixelRatio;
+      cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px'; }
+    size(); addEventListener('resize', size);
+    var N = Math.min(46, Math.round(innerWidth / 26));
+    for (var i = 0; i < N; i++) pts.push({x: Math.random(), y: Math.random(), vx:(Math.random()-.5)*0.00035, vy:(Math.random()-.5)*0.00035});
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      var P = pts.map(function(p){ return {x:p.x*W, y:p.y*H}; });
+      for (var i=0;i<P.length;i++) for (var j=i+1;j<P.length;j++){
+        var dx=P[i].x-P[j].x, dy=P[i].y-P[j].y, d=Math.hypot(dx,dy);
+        var lim = 130*devicePixelRatio;
+        if (d < lim){
+          ctx.strokeStyle = 'rgba(80,160,235,' + (0.16*(1-d/lim)).toFixed(3) + ')';
+          ctx.lineWidth = 1*devicePixelRatio;
+          ctx.beginPath(); ctx.moveTo(P[i].x,P[i].y); ctx.lineTo(P[j].x,P[j].y); ctx.stroke();
+        }
+      }
+      P.forEach(function(p){ ctx.fillStyle='rgba(120,200,255,.5)'; ctx.beginPath();
+        ctx.arc(p.x,p.y,1.6*devicePixelRatio,0,7); ctx.fill(); });
+      pts.forEach(function(p){ p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>1) p.vx*=-1; if(p.y<0||p.y>1) p.vy*=-1; });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ============ 分数：滚动 + 环 ============
+  var elScore = document.getElementById('scoreTxt');
+  var arc = document.getElementById('arc'), C = 2 * Math.PI * 51;
   arc.setAttribute('stroke-dasharray', C.toFixed(1));
-  setTimeout(function(){ arc.setAttribute('stroke-dashoffset', (C * (1 - score / 100)).toFixed(1)); }, 120);
+  var cur = 0;
+  function tick(){
+    cur += Math.max(1, Math.round((score - cur) / 8));
+    if (cur >= score) cur = score;
+    elScore.textContent = cur;
+    if (cur < score) requestAnimationFrame(tick);
+  }
+  setTimeout(tick, 260);
+  setTimeout(function(){ arc.setAttribute('stroke-dashoffset', (C * (1 - score / 100)).toFixed(1)); }, 300);
 
   var g, gd, col;
   if (score >= 90)      { g='防骗高手'; gd='对方刚开口你就起疑了，这种反应很难被套住。'; col='#2fd39a'; }
-  else if (score >= 75) { g='警惕性不错'; gd='能发现问题，但还会被"限时"这类话术带走一下。'; col='#37b6ff'; }
+  else if (score >= 75) { g='警惕性不错'; gd='能发现问题，但还会被「限时」这类话术带走一下。'; col='#37b6ff'; }
   else if (score >= 60) { g='刚够用'; gd='中途察觉到不对，但已经给出去了一部分信息。'; col='#ffbf47'; }
-  else if (score >= 40) { g='需要练'; gd='被推进到较深的位置才发现，下次要在"要钱"之前就停。'; col='#ff9f43'; }
-  else                  { g='高危'; gd='几乎全程跟着对方走。记住：先交钱、别告诉别人、共享屏幕，这三句话一出就停。'; col='#ff6b6b'; }
-
+  else if (score >= 40) { g='需要练'; gd='被推进到较深的位置才发现，下次要在「要钱」之前就停。'; col='#ff9f43'; }
+  else                  { g='高危'; gd='几乎全程跟着对方走。记住：先交钱、别告诉别人、共享屏幕，这三句一出就停。'; col='#ff6b6b'; }
   document.getElementById('grade').textContent = g;
   document.getElementById('gradeDesc').textContent = gd;
   var badge = document.getElementById('badge');
@@ -238,57 +380,72 @@
   badge.style.background = 'rgba(255,255,255,.06)';
   badge.style.color = col;
   badge.style.border = '1px solid ' + col + '55';
+  document.getElementById('halo').style.boxShadow = '0 0 28px ' + col + '44';
 
-  // ---------- 雷达图 ----------
+  // ============ 概览 ============
+  document.getElementById('kType').textContent = type;
+  document.getElementById('kStage').textContent = '第' + stage + '阶';
+  var heldMap = [0, 3800, 2600, 1500, 800, 0];
+  var held = heldMap[stage];
+  document.getElementById('kHeld').textContent = held ? held + ' 元' : '没收钱';
+
+  // ============ 雷达 ============
   var axes = [
-    {name:'识破时机', v:t1, max:40, color:'#2fd39a'},
-    {name:'质疑质量', v:t2, max:25, color:'#37b6ff'},
-    {name:'信息保护', v:t3, max:20, color:'#a78bfa'},
-    {name:'应对动作', v:t4, max:15, color:'#ffbf47'}
+    {name:'识破时机', key:'t1', v:t1, max:40, color:'#2fd39a'},
+    {name:'质疑质量', key:'t2', v:t2, max:25, color:'#37b6ff'},
+    {name:'信息保护', key:'t3', v:t3, max:20, color:'#a78bfa'},
+    {name:'应对动作', key:'t4', v:t4, max:15, color:'#ffbf47'}
   ];
-  var cx = 145, cy = 118, R = 82;
+  var cx = 150, cy = 122, R = 86;
   function pt(i, r){
     var a = -Math.PI/2 + i * (Math.PI*2/axes.length);
     return [cx + Math.cos(a)*r, cy + Math.sin(a)*r];
   }
-  var svg = document.getElementById('radar'), NS = 'http://www.w3.org/2000/svg';
-  function el(t, at){
-    var e = document.createElementNS(NS, t);
-    for (var k in at) e.setAttribute(k, at[k]);
-    return e;
-  }
-  // 网格
-  [0.25, 0.5, 0.75, 1].forEach(function(r){
-    var d = axes.map(function(_, i){ var p = pt(i, R*r); return (i?'L':'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ') + 'Z';
+  var svg = document.getElementById('radar'), NS='http://www.w3.org/2000/svg';
+  function el(t, at){ var e = document.createElementNS(NS,t); for (var k in at) e.setAttribute(k, at[k]); return e; }
+
+  [0.25,0.5,0.75,1].forEach(function(r){
+    var d = axes.map(function(_,i){ var p = pt(i, R*r); return (i?'L':'M') + p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ')+'Z';
     svg.appendChild(el('path', {d:d, fill:'none', stroke:'rgba(255,255,255,.075)', 'stroke-width':1}));
   });
-  axes.forEach(function(_, i){
-    var p = pt(i, R);
-    svg.appendChild(el('line', {x1:cx, y1:cy, x2:p[0], y2:p[1], stroke:'rgba(255,255,255,.075)', 'stroke-width':1}));
-  });
-  // 数据多边形
-  var dpath = axes.map(function(a, i){
-    var p = pt(i, R * Math.max(0.05, a.v / a.max));
-    return (i?'L':'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1);
-  }).join(' ') + 'Z';
-  var poly = el('path', {d:dpath, fill:'rgba(55,182,255,.26)', stroke:'#37b6ff', 'stroke-width':2, 'stroke-linejoin':'round'});
+  axes.forEach(function(_,i){ var p=pt(i,R);
+    svg.appendChild(el('line',{x1:cx,y1:cy,x2:p[0],y2:p[1],stroke:'rgba(255,255,255,.075)','stroke-width':1})); });
+
+  var poly = el('path', {d:'', fill:'rgba(55,182,255,.24)', stroke:'#37b6ff', 'stroke-width':2, 'stroke-linejoin':'round'});
   svg.appendChild(poly);
-  // 顶点
-  axes.forEach(function(a, i){
-    var p = pt(i, R * Math.max(0.05, a.v / a.max));
-    svg.appendChild(el('circle', {cx:p[0], cy:p[1], r:3.6, fill:a.color}));
+  var dots = axes.map(function(a,i){
+    var c = el('circle',{cx:cx, cy:cy, r:3.8, fill:a.color});
+    c.style.filter = 'drop-shadow(0 0 6px ' + a.color + '88)';
+    svg.appendChild(c); return c;
   });
-  // 轴标签
-  axes.forEach(function(a, i){
-    var p = pt(i, R + 26);
-    var tx = el('text', {
-      x:p[0], y:p[1], fill:'#93a4c3', 'font-size':'11.5',
-      'text-anchor': Math.abs(p[0]-cx) < 8 ? 'middle' : (p[0] > cx ? 'start' : 'end'),
-      'dominant-baseline':'middle', 'font-family':'inherit'
+  axes.forEach(function(a,i){
+    var p = pt(i, R+28);
+    var tx = el('text',{ x:p[0], y:p[1], fill:'#93a4c3', 'font-size':'11.5',
+      'text-anchor': Math.abs(p[0]-cx)<8?'middle':(p[0]>cx?'start':'end'),
+      'dominant-baseline':'middle','font-family':'inherit'});
+    tx.textContent = a.name; svg.appendChild(tx);
+    var tv = el('text',{ x:p[0], y:p[1]+15, fill:a.color, 'font-size':'11',
+      'text-anchor': Math.abs(p[0]-cx)<8?'middle':(p[0]>cx?'start':'end'),
+      'dominant-baseline':'middle','font-family':'inherit','font-weight':'700'});
+    tv.textContent = a.v + '/' + a.max; svg.appendChild(tv);
+  });
+
+  // 生长动画
+  var prog = 0;
+  function grow(){
+    prog = Math.min(1, prog + 0.045);
+    var d = axes.map(function(a,i){
+      var p = pt(i, R * Math.max(0.04, (a.v/a.max) * prog));
+      return (i?'L':'M') + p[0].toFixed(1)+' '+p[1].toFixed(1);
+    }).join(' ')+'Z';
+    poly.setAttribute('d', d);
+    axes.forEach(function(a,i){
+      var p = pt(i, R * Math.max(0.04, (a.v/a.max) * prog));
+      dots[i].setAttribute('cx', p[0]); dots[i].setAttribute('cy', p[1]);
     });
-    tx.textContent = a.name;
-    svg.appendChild(tx);
-  });
+    if (prog < 1) requestAnimationFrame(grow);
+  }
+  setTimeout(grow, 420);
 
   // 图例
   var lg = document.getElementById('legend');
@@ -296,8 +453,7 @@
     var pct = Math.round(a.v / a.max * 100);
     var row = document.createElement('div');
     row.className = 'lg';
-    row.innerHTML =
-      '<i style="background:'+a.color+'"></i>' +
+    row.innerHTML = '<i class="d" style="background:'+a.color+'"></i>' +
       '<span class="n">'+a.name+'</span>' +
       '<span class="bar"><i style="background:'+a.color+'" data-w="'+pct+'"></i></span>' +
       '<span class="v" style="color:'+a.color+'">'+a.v+'<span style="color:#64748b;font-weight:400">/'+a.max+'</span></span>';
@@ -305,36 +461,119 @@
   });
   setTimeout(function(){
     document.querySelectorAll('.lg .bar > i').forEach(function(e){ e.style.width = e.dataset.w + '%'; });
-  }, 260);
+  }, 560);
 
-  // ---------- 五阶 ----------
+  // 四维解读
+  function say(name, pct){
+    var hi = pct >= 80, mid = pct >= 55, lo = pct < 35;
+    var m = {
+      '识破时机': hi ? '对方刚开始铺垫你就起疑，这是最难被套的状态。' : mid ? '你察觉到了异常，但已经走到中段。' : lo ? '你是在对方要钱之后才反应过来的——下次在「要你提供信息」时就该停。' : '你的反应偏慢，建议把「先交钱、别告诉别人」当作硬开关。',
+      '质疑质量': hi ? '你的追问打在关键点上，对方很难圆场。' : mid ? '你问了，但问题还比较泛，容易被一句话带过去。' : lo ? '你几乎没有追问，全程在听对方讲。下次先问「你是哪个单位的、我怎么核实」。' : '质疑偏少，建议每次至少问三句再决定。',
+      '信息保护': hi ? '你没有透露关键信息，守得很好。' : mid ? '你透露了一些信息，虽然不致命，但足够对方用来施压。' : lo ? '你把学号、卡号之类的信息说出去了，这是最容易被利用的部分。' : '信息保护意识偏弱，记住：任何对话都不需要真实卡号和验证码。',
+      '应对动作': hi ? '你做了正确的动作：停、挂、去核实。' : mid ? '你想到了要停，但动作不完整。' : lo ? '你在犹豫，没有立刻停下。下次直接挂断，不解释。' : '需要练习「立刻停止」这个动作。'
+    };
+    return m[name] || '';
+  }
+  var readBox = document.getElementById('read');
+  axes.forEach(function(a){
+    var pct = a.v / a.max * 100;
+    var d = document.createElement('div');
+    d.textContent = a.name + '：' + say(a.name, pct);
+    readBox.appendChild(d);
+  });
+
+  // ============ 五阶 ============
   var stageNames = ['建立信任','制造恐惧或稀缺','隐性隔离','引导操作','加码'];
   var st = document.getElementById('steps');
   stageNames.forEach(function(n, i){
-    var idx = i + 1;
-    var cls = 'st';
+    var idx = i + 1, cls = 'st';
     if (idx < stage) cls += ' done';
     if (idx === stage) cls += ' stop cur';
-    var tag = '';
-    if (idx < stage) tag = '<span class="tag">扛住了</span>';
-    if (idx === stage) tag = '<span class="tag">停在这里</span>';
-    st.innerHTML += '<div class="'+cls+'"><span class="dot">'+(idx<stage?'✓':idx)+'</span>'+
-                    '<span>第'+idx+'阶 · '+n+'</span>'+tag+'</div>';
+    var tag = idx < stage ? '<span class="tag">扛住了</span>' : (idx === stage ? '<span class="tag">停在这里</span>' : '');
+    var row = document.createElement('div');
+    row.className = cls;
+    row.style.animationDelay = (0.6 + i * 0.09) + 's';
+    row.innerHTML = '<span class="dot">' + (idx < stage ? '✓' : idx) + '</span>' +
+                    '<span>第' + idx + '阶 · ' + n + '</span>' + tag;
+    st.appendChild(row);
   });
 
-  // ---------- 点评 / 日期 ----------
-  document.getElementById('comment').innerHTML = cmt;
+  var nextText = [
+    '你还在第一阶就停了——对方只是刚开始铺垫，你连听都没多听。',
+    '如果你没停，下一步对方会开始<b>制造恐惧或稀缺</b>：限时、名额、逾期、影响征信。',
+    '如果你没停，下一步对方会要求<b>别告诉别人</b>——这是最危险的信号，一旦你答应了，就只剩他一个人的声音。',
+    '如果你没停，下一步对方会开始<b>引导操作</b>：下载软件、共享屏幕、转账到某个账户。',
+    '你已经走到最后一阶，对方在用<b>沉没成本</b>逼你：再充一笔就能提现、不做前面的全打水漂。'
+  ];
+  document.getElementById('nextTip').innerHTML = nextText[stage - 1];
+
+  // ============ 高危话术 ============
+  var qMap = {
+    '冒充老师': ['这事先别在群里问其他老师，他们不清楚咱们班的安排。', '这句话的作用是<b>切断你的核实路径</b>。真正的老师不会怕你去问。'],
+    '冒充公检法': ['你现在涉嫌洗钱，先把资金转到安全账户配合调查，不许告诉任何人。', '这句话同时用了<b>恐惧</b>和<b>隔离</b>——公检法不会电话办案，也不存在安全账户。'],
+    '客服': ['您先下载腾讯会议，打开屏幕共享，我远程指导您操作。', '屏幕共享等于把验证码和密码实时交给对方。<b>官方客服永远不会要求共享屏幕。</b>'],
+    '刷单': ['这单是连单任务，必须做完三单才能一起结算，中途退出前面垫的钱不退。', '这是<b>沉没成本陷阱</b>：用你已经投入的钱，逼你继续投入更多。'],
+    '兼职': ['入职前先交 300 保证金，防止你干两天就跑，干满一个月全额退。', '《劳动合同法》第九条明确禁止收取押金。<b>凡是入职前要钱的，都是诈骗。</b>'],
+    '借卡': ['兄弟帮个忙，帮我收笔钱，就过个账，给你 1000 辛苦费。', '这是帮信罪的典型入口。<b>出借账户帮人收款，可能构成犯罪。</b>'],
+    '网恋': ['我这边有个内部渠道，稳赚不赔，你跟着我投一点试试。', '恋爱关系里出现投资、博彩、虚拟货币，就是杀猪盘。'],
+    '机票': ['您的航班取消了，点这个链接办理退改签，还能领补偿。', '短信里的链接一律不点，自己打开航司官方 App 核实。']
+  };
+  var dq = '对方最常用的一句话是：先交钱、别告诉别人、快点操作。';
+  var dw = '记住这三件事同时出现时，基本可以判定是诈骗。';
+  Object.keys(qMap).forEach(function(k){
+    if (type.indexOf(k) >= 0){ dq = qMap[k][0]; dw = qMap[k][1]; }
+  });
+  document.getElementById('dangerQuote').textContent = dq;
+  document.getElementById('dangerWhy').innerHTML = dw;
+
+  // ============ 下一步 ============
+  var todos = [];
+  if (score >= 75){
+    todos = ['把今天这次演练里对方说的那句话，讲给一个室友听。',
+             '让室友也来练一次，看谁能更早识破。',
+             '记住学校的求助电话，存在手机里。'];
+  } else if (score >= 50){
+    todos = ['再练一次同类骗局，这次目标是在第二阶之前就停下。',
+             '把「先交钱、别告诉别人、共享屏幕」抄在便签上。',
+             '去看看真实案例还原，知道对方下一步会做什么。'];
+  } else {
+    todos = ['重新练一次，这次只做一件事：对方一提钱就停。',
+             '把下面三句话读三遍，它们是硬开关，不需要判断。',
+             '遇到任何要你转账的电话，先挂断，再打 96110 问一句。'];
+  }
+  var todoBox = document.getElementById('todo');
+  todos.forEach(function(t, i){
+    var d = document.createElement('div');
+    d.className = 'td';
+    d.innerHTML = '<i>' + (i+1) + '</i><div>' + t + '</div>';
+    todoBox.appendChild(d);
+  });
+
+  // ============ 点评 / 日期 ============
+  var defaultCmt = '你在第 ' + stage + ' 阶停了下来。' +
+    (stage <= 2 ? '这个位置很靠前，说明你对「不对劲」的直觉是准的。' : '不算早，但也不算晚——真正危险的是下一阶。') +
+    ' 记住：<strong>识破一次，比背十条常识有用。</strong>';
+  document.getElementById('comment').innerHTML = cmt || defaultCmt;
+
   var d = new Date();
   document.getElementById('dateTxt').textContent =
-    d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+    d.getFullYear() + '.' + (d.getMonth()+1) + '.' + d.getDate();
 })();
-
-function shareTip(){
-  var h = document.getElementById('shareHint');
-  h.textContent = 'iPhone：同时按「音量+」和「电源键」；安卓：按「电源键」和「音量-」';
-  h.style.color = '#37b6ff';
-  setTimeout(function(){ h.style.color = '#64748b'; }, 4000);
-}
 </script>
+
+<script>
+(function(){
+  var a=document.getElementById('pBgm'), b=document.getElementById('pBgmBtn');
+  if(!a||!b) return;
+  a.volume=0.42;
+  function ui(){ b.classList.toggle('off', a.paused); }
+  function start(){ a.play().then(ui).catch(ui); }
+  start();
+  document.addEventListener('pointerdown', function once(){ if(a.paused) start(); document.removeEventListener('pointerdown', once); }, {passive:true});
+  b.addEventListener('click', function(e){ e.stopPropagation(); if(a.paused) start(); else { a.pause(); ui(); } });
+  a.addEventListener('play', ui); a.addEventListener('pause', ui); ui();
+})();
+</script>
+
 </body>
 </html>
