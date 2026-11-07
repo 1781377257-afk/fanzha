@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>本校反诈求助卡 | 反诈小安</title>
+<title>反诈小安 · 校园反诈求助卡</title>
 <style>
   :root{
     --bg1:#080e19;--bg2:#0d1830;--card:rgba(255,255,255,.045);
     --line:rgba(255,255,255,.10);--txt:#e8eefc;--sub:#93a4c3;
-    --brand:#37b6ff;--ok:#2fd39a;--bad:#ff6b6b;--warn:#ffbf47;
+    --brand:#37b6ff;--ok:#2fd39a;--bad:#ff6b6b;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{
@@ -21,106 +21,98 @@
     -webkit-font-smoothing:antialiased;
   }
   canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75}
-  .wrap{max-width:430px;margin:0 auto;position:relative;z-index:2}
-
+  .wrap{max-width:440px;margin:0 auto;position:relative;z-index:2}
   .rv{opacity:0;transform:translateY(16px);animation:rv .7s cubic-bezier(.2,.8,.2,1) forwards}
   @keyframes rv{to{opacity:1;transform:none}}
   .d1{animation-delay:.04s}.d2{animation-delay:.12s}.d3{animation-delay:.2s}
-  .d4{animation-delay:.28s}.d5{animation-delay:.36s}.d6{animation-delay:.44s}
 
   .head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
   .logo{
     width:38px;height:38px;border-radius:12px;flex:0 0 auto;
     background:linear-gradient(140deg,#ff8a8a,#c0261f);
-    display:grid;place-items:center;font-size:18px;font-weight:700;
-    box-shadow:0 8px 22px rgba(255,107,107,.3);
+    display:grid;place-items:center;font-size:18px;font-weight:700;color:#fff;
+    text-decoration:none;box-shadow:0 8px 22px rgba(255,107,107,.3);
   }
   .head h1{font-size:15px;font-weight:600;letter-spacing:.2px}
   .head p{font-size:11.5px;color:var(--sub);margin-top:2px}
 
-  /* 急救条 */
   .urg{
-    display:flex;gap:11px;align-items:flex-start;
-    padding:14px 15px;border-radius:16px;margin-bottom:16px;
+    display:flex;gap:11px;align-items:flex-start;padding:14px 15px;border-radius:16px;margin-bottom:14px;
     background:linear-gradient(140deg,rgba(255,107,107,.16),rgba(255,107,107,.05));
     border:1px solid rgba(255,107,107,.30);
-    box-shadow:0 10px 30px rgba(255,80,80,.10);
   }
-  .urg .pulse{
-    width:9px;height:9px;border-radius:50%;background:#ff6b6b;flex:0 0 auto;margin-top:5px;
-    box-shadow:0 0 0 0 rgba(255,107,107,.6);animation:pl 1.8s infinite;
-  }
+  .urg .pulse{width:9px;height:9px;border-radius:50%;background:#ff6b6b;flex:0 0 auto;margin-top:5px;
+    box-shadow:0 0 0 0 rgba(255,107,107,.6);animation:pl 1.8s infinite}
   @keyframes pl{0%{box-shadow:0 0 0 0 rgba(255,107,107,.55)}70%{box-shadow:0 0 0 10px rgba(255,107,107,0)}100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}}
   .urg div{font-size:12.5px;line-height:1.8;color:#ffd9d9}
   .urg b{color:#fff}
 
-  /* 校区切换 */
-  .tabs{display:flex;gap:8px;margin-bottom:14px;position:relative}
+  .tabs{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
   .tab{
-    flex:1;padding:11px;border-radius:12px;text-align:center;font-size:13px;font-weight:600;
+    flex:0 0 auto;padding:10px 15px;border-radius:12px;text-align:center;font-size:13px;font-weight:600;
     background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--sub);
-    cursor:pointer;transition:.22s;user-select:none;
+    cursor:pointer;transition:.22s;user-select:none;white-space:nowrap;
   }
-  .tab.on{
-    background:linear-gradient(140deg,#37b6ff,#1a6fd4);border-color:transparent;color:#fff;
-    box-shadow:0 8px 22px rgba(55,182,255,.26);
+  .tab.on{background:linear-gradient(140deg,#37b6ff,#1a6fd4);border-color:transparent;color:#fff;
+    box-shadow:0 8px 22px rgba(55,182,255,.26)}
+
+  .search{
+    display:flex;align-items:center;gap:9px;margin-bottom:12px;
+    background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
   }
+  .search svg{flex:0 0 auto;opacity:.5}
+  .search input{
+    flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt);
+    font-size:13px;font-family:inherit;
+  }
+  .search input::placeholder{color:#5b7191}
+
+  .list{display:grid;gap:9px}
+  .ps{
+    display:block;text-decoration:none;color:inherit;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:13px 14px;transition:.2s;position:relative;overflow:hidden;
+    animation:rv .45s ease both;
+  }
+  .ps:hover{border-color:rgba(55,182,255,.45);transform:translateY(-2px)}
+  .ps::after{
+    content:"";position:absolute;right:-30px;top:-30px;width:100px;height:100px;border-radius:50%;
+    background:radial-gradient(circle,rgba(55,182,255,.12),transparent 70%);pointer-events:none;
+  }
+  .ps .top{display:flex;align-items:baseline;gap:10px;margin-bottom:5px}
+  .ps .nm{font-size:14px;font-weight:700;letter-spacing:.2px;flex:1;min-width:0}
+  .ps .tel{font-size:13px;font-weight:800;color:#8fd4ff;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .ps .ad{font-size:11.5px;color:var(--sub);line-height:1.6}
 
   .card{
     background:var(--card);border:1px solid var(--line);border-radius:18px;
-    padding:16px 15px;margin-bottom:12px;backdrop-filter:blur(12px);
-    position:relative;overflow:hidden;transition:.25s;
-  }
-  .card::after{
-    content:"";position:absolute;right:-36px;top:-36px;width:120px;height:120px;border-radius:50%;
-    background:radial-gradient(circle,rgba(55,182,255,.14),transparent 70%);pointer-events:none;
+    padding:16px 15px;margin-bottom:12px;backdrop-filter:blur(12px);position:relative;overflow:hidden;
   }
   .card.urgent{border-color:rgba(255,107,107,.30);background:rgba(255,107,107,.06)}
-  .card.urgent::after{background:radial-gradient(circle,rgba(255,107,107,.22),transparent 70%)}
-  .card.soft{border-color:rgba(55,182,255,.20);background:rgba(55,182,255,.05)}
-  .card:hover{transform:translateY(-2px)}
-
   .row{display:flex;align-items:flex-start;gap:12px;position:relative;z-index:1}
-  .ico{
-    width:40px;height:40px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
-    background:rgba(255,255,255,.06);font-size:18px;
-  }
+  .ico{width:40px;height:40px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
+    background:rgba(255,255,255,.06);font-size:18px}
   .card.urgent .ico{background:rgba(255,107,107,.16)}
   .info{flex:1;min-width:0}
   .info .lab{font-size:10.5px;color:var(--sub);letter-spacing:.8px;margin-bottom:4px}
-  .info .name{font-size:15px;font-weight:700;margin-bottom:5px;letter-spacing:.2px}
+  .info .name{font-size:15px;font-weight:700;margin-bottom:5px}
   .info .addr{font-size:12px;color:var(--sub);line-height:1.7}
-  .info .addr b{color:#cfdcf4;font-weight:500}
 
   .call{
     display:flex;align-items:center;justify-content:center;gap:7px;
-    margin-top:13px;padding:13px;border-radius:13px;text-decoration:none;
+    margin-top:12px;padding:13px;border-radius:13px;text-decoration:none;
     background:linear-gradient(140deg,#37b6ff,#1a6fd4);color:#fff;
     font-size:16px;font-weight:800;letter-spacing:1.2px;
-    box-shadow:0 10px 24px rgba(55,182,255,.24);
-    position:relative;z-index:1;transition:.2s;
+    box-shadow:0 10px 24px rgba(55,182,255,.24);position:relative;z-index:1;
     font-variant-numeric:tabular-nums;
   }
-  .call:active{transform:scale(.98)}
+  .card.urgent .call{background:linear-gradient(140deg,#ff7a7a,#c0261f);box-shadow:0 10px 24px rgba(255,107,107,.26)}
   .call small{font-size:10.5px;font-weight:500;opacity:.85;letter-spacing:0}
-  .card.urgent .call{
-    background:linear-gradient(140deg,#ff7a7a,#c0261f);
-    box-shadow:0 10px 24px rgba(255,107,107,.26);
-    animation:urgpulse 2.6s ease-in-out infinite;
-  }
-  @keyframes urgpulse{0%,100%{box-shadow:0 10px 24px rgba(255,107,107,.20)}50%{box-shadow:0 10px 32px rgba(255,107,107,.42)}}
 
   .t{display:flex;align-items:center;gap:8px;margin:24px 0 12px}
   .t::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--brand)}
   .t span{font-size:13.5px;font-weight:600;letter-spacing:.4px}
-
-  .check{display:grid;gap:10px}
-  .ck{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.7;color:#cfdcf4;opacity:0;animation:rv .5s ease forwards}
-  .ck i{
-    width:17px;height:17px;border-radius:5px;flex:0 0 auto;margin-top:1px;
-    border:1.5px solid rgba(55,182,255,.5);background:rgba(55,182,255,.12);
-    display:grid;place-items:center;font-size:10px;color:var(--brand);font-style:normal;
-  }
 
   .myth{display:grid;gap:11px}
   .mi{padding:13px 14px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -128,14 +120,9 @@
   .mi .good{font-size:12.5px;color:#d7e5ff;line-height:1.75}
   .mi .good b{color:var(--ok)}
 
-  .hotline{
-    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;
-  }
-  .hl{
-    display:block;padding:15px 13px;border-radius:14px;text-decoration:none;color:inherit;
-    background:rgba(55,182,255,.07);border:1px solid rgba(55,182,255,.20);
-    transition:.2s;
-  }
+  .hotline{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+  .hl{display:block;padding:15px 13px;border-radius:14px;text-decoration:none;color:inherit;
+    background:rgba(55,182,255,.07);border:1px solid rgba(55,182,255,.20);transition:.2s}
   .hl:hover{border-color:rgba(55,182,255,.5);transform:translateY(-2px)}
   .hl b{display:block;font-size:19px;font-weight:800;color:#8fd4ff;letter-spacing:.5px;font-variant-numeric:tabular-nums}
   .hl span{display:block;font-size:10.5px;color:var(--sub);margin-top:4px}
@@ -143,15 +130,15 @@
   .foot{text-align:center;font-size:11px;color:#64748b;line-height:1.9;margin-top:20px}
   .foot .hr{height:1px;background:var(--line);margin:16px 0}
   .hide{display:none}
+  .empty{padding:22px;text-align:center;font-size:12.5px;color:#5b7191}
 
   .pgt{position:fixed;right:16px;bottom:18px;z-index:60;width:42px;height:42px;border-radius:50%;
     border:1px solid rgba(55,182,255,.3);background:rgba(10,20,34,.86);color:#8fc6ff;
     font-size:16px;cursor:pointer;display:grid;place-items:center;
     box-shadow:0 8px 22px rgba(0,0,0,.4);transition:.2s;backdrop-filter:blur(8px)}
-  .pgt:hover{border-color:rgba(55,182,255,.7)}
   .pgt.off{color:#4d6a8c;border-color:rgba(255,255,255,.1)}
 
-  @media (min-width:760px){ body{padding:40px 24px 64px} .wrap{max-width:560px} .card{padding:20px 22px} }
+  @media (min-width:760px){ body{padding:40px 24px 64px} .wrap{max-width:560px} }
 </style>
 </head>
 <body>
@@ -159,10 +146,10 @@
 <div class="wrap">
 
   <div class="head rv d1">
-    <div class="logo">急</div>
+    <a class="logo" href="index.html">急</a>
     <div>
-      <h1>内蒙古师范大学 · 反诈求助卡</h1>
-      <p>反诈小安 · 存下来，出事照着打</p>
+      <h1>内蒙古自治区 · 校园反诈求助卡</h1>
+      <p>反诈小安 · 呼和浩特市辖区派出所速查</p>
     </div>
   </div>
 
@@ -170,148 +157,97 @@
     <span class="pulse"></span>
     <div>
       <b>已经转账了？先做三件事：</b><br>
-      ① 停止一切转账　② 截图保存聊天和转账记录（别删）　③ 打电话报警或直接去派出所
+      ① 停止一切转账　② 截图保存聊天和转账记录（别删）　③ 打电话报警或直接去最近的派出所
     </div>
   </div>
 
   <div class="tabs rv d2">
-    <div class="tab on" data-campus="saihan">赛罕校区</div>
-    <div class="tab" data-campus="shengle">盛乐校区</div>
+    <div class="tab on" data-c="saihan">赛罕区</div>
+    <div class="tab" data-c="xincheng">新城区</div>
+    <div class="tab" data-c="huimin">回民区</div>
+    <div class="tab" data-c="yuquan">玉泉区</div>
+    <div class="tab" data-c="qixian">盛乐 · 旗县</div>
   </div>
 
-  <!-- 赛罕 -->
-  <div id="saihan">
+  <div class="search rv d2" id="searchWrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8ea3c2" stroke-width="2">
+      <circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/>
+    </svg>
+    <input id="q" type="search" placeholder="搜派出所名称或地址" autocomplete="off">
+  </div>
+
+  <div class="list rv d3" id="list"></div>
+
+  <div id="qixian" class="hide">
+    <div class="list" id="list2" style="margin-bottom:10px"></div>
+    <p style="font-size:11.5px;color:#7f97b5;line-height:1.8;margin:0 0 12px 2px">
+      盛乐镇属和林格尔县。其他旗县（土默特左旗、托克托县、清水河县、武川县）的任一派出所同样受理电诈案件。</p>
     <div class="card urgent rv d2">
       <div class="row">
         <div class="ico">🚔</div>
         <div class="info">
-          <div class="lab">辖区派出所 · 报案去这里</div>
-          <div class="name">大学西路派出所</div>
-          <div class="addr">赛罕区新建西街 5 号（学校北门斜对面）<br><b>从北门出去，步行约 5 分钟</b></div>
+          <div class="lab">土默特左旗 / 托克托县 / 和林格尔县 / 清水河县 / 武川县</div>
+          <div class="name">就近报案，全县派出所通受</div>
+          <div class="addr">乡镇派出所同样受理电诈案件。<b>不要为了“回辖区”多跑几十公里。</b></div>
         </div>
       </div>
-      <a class="call" href="tel:04714964903">📞 0471-4964903 <small>点击拨打</small></a>
+      <a class="call" href="tel:110">📞 110 <small>由接线员转到最近派出所</small></a>
     </div>
-
     <div class="card rv d3">
       <div class="row">
         <div class="ico">🛡️</div>
         <div class="info">
-          <div class="lab">学校保卫处 · 24 小时</div>
-          <div class="name">保卫处值班室</div>
-          <div class="addr">赛罕校区保卫处楼一楼值班室<br>可协助对接警方、调取校园监控</div>
+          <div class="lab">报案后记得要回执</div>
+          <div class="name">《受案回执》</div>
+          <div class="addr">没有回执等于没报。后续查询进展、合并案件都靠它。</div>
         </div>
       </div>
-      <a class="call" href="tel:04714392110">📞 0471-4392110 <small>点击拨打</small></a>
-    </div>
-
-    <div class="card rv d4">
-      <div class="row">
-        <div class="ico">👮</div>
-        <div class="info">
-          <div class="lab">驻校警长</div>
-          <div class="name">校园民警</div>
-          <div class="addr">在校内遇到紧急情况，可直接联系</div>
-        </div>
-      </div>
-      <a class="call" href="tel:13347148110">📞 133-4714-8110 <small>点击拨打</small></a>
-    </div>
-
-    <div class="card rv d5">
-      <div class="row">
-        <div class="ico">💬</div>
-        <div class="info">
-          <div class="lab">心理健康教育中心</div>
-          <div class="name">悦心空间</div>
-          <div class="addr">学生公寓 8 号楼「一站式」学生社区北侧<br>企业微信 → 工作台 → 学工服务 → 心理健康</div>
-        </div>
-      </div>
-      <a class="call" href="tel:04717388380">📞 0471-7388380 <small>点击拨打</small></a>
     </div>
   </div>
 
-  <!-- 盛乐 -->
-  <div id="shengle" class="hide">
-    <div class="card urgent rv d2">
-      <div class="row">
-        <div class="ico">🚔</div>
-        <div class="info">
-          <div class="lab">辖区派出所 · 报案去这里</div>
-          <div class="name">盛乐派出所</div>
-          <div class="addr">学校东门正南方向约 90 米<br><b>从东门出去，步行约 10 分钟</b></div>
-        </div>
+  <div class="t" style="margin-top:22px"><span>事发之后，这三类人一定要告诉</span></div>
+  <div class="card">
+    <div class="row">
+      <div class="ico">🛡️</div>
+      <div class="info">
+        <div class="lab">第一类 · 学校保卫处</div>
+        <div class="name">24 小时值班室</div>
+        <div class="addr">能帮你对接警方、调取校园监控。<b>号码请在入学时存进手机</b>，或看学生手册首页。</div>
       </div>
-      <a class="call" href="tel:04717390280">📞 0471-7390280 <small>点击拨打</small></a>
-    </div>
-
-    <div class="card rv d3">
-      <div class="row">
-        <div class="ico">🛡️</div>
-        <div class="info">
-          <div class="lab">学校保卫处 · 24 小时</div>
-          <div class="name">保卫处值班室</div>
-          <div class="addr">盛乐校区行政楼西侧一楼值班室<br>可协助对接警方、调取校园监控</div>
-        </div>
-      </div>
-      <a class="call" href="tel:04717384110">📞 0471-7384110 <small>点击拨打</small></a>
-    </div>
-
-    <div class="card rv d4">
-      <div class="row">
-        <div class="ico">👮</div>
-        <div class="info">
-          <div class="lab">驻校警长</div>
-          <div class="name">校园民警</div>
-          <div class="addr">在校内遇到紧急情况，可直接联系</div>
-        </div>
-      </div>
-      <a class="call" href="tel:13847132888">📞 138-4713-2888 <small>点击拨打</small></a>
-    </div>
-
-    <div class="card rv d5">
-      <div class="row">
-        <div class="ico">🏢</div>
-        <div class="info">
-          <div class="lab">学生工作处 / 资助管理中心</div>
-          <div class="name">学生事务中心 A 座 305 室</div>
-          <div class="addr">资助、处分、学籍相关问题可咨询</div>
-        </div>
-      </div>
-      <a class="call" href="tel:04717388385">📞 0471-7388385 <small>点击拨打</small></a>
-    </div>
-
-    <div class="card rv d6">
-      <div class="row">
-        <div class="ico">💬</div>
-        <div class="info">
-          <div class="lab">心理健康教育中心</div>
-          <div class="name">学生事务中心 B305 / B306</div>
-          <div class="addr">企业微信 → 工作台 → 学工服务 → 心理健康</div>
-        </div>
-      </div>
-      <a class="call" href="tel:04717388380">📞 0471-7388380 <small>点击拨打</small></a>
     </div>
   </div>
 
-  <div class="t rv d6"><span>报案带什么（缺一样会多跑一趟）</span></div>
-  <div class="card rv d6">
-    <div class="check">
-      <div class="ck" style="animation-delay:.5s"><i>✓</i><div>本人身份证</div></div>
-      <div class="ck" style="animation-delay:.58s"><i>✓</i><div>转账记录完整截图（金额、时间、收款方）</div></div>
-      <div class="ck" style="animation-delay:.66s"><i>✓</i><div>聊天记录完整截图，一条都别删</div></div>
-      <div class="ck" style="animation-delay:.74s"><i>✓</i><div>对方的账号、收款码、电话、网址</div></div>
+  <div class="card">
+    <div class="row">
+      <div class="ico">🧑‍🏫</div>
+      <div class="info">
+        <div class="lab">第二类 · 辅导员</div>
+        <div class="name">你的直接负责人</div>
+        <div class="addr">学校层面的处分、资助、心理支持都要经他。<b>越早说越好，瞒着才是最坏的选择。</b></div>
+      </div>
     </div>
   </div>
 
-  <div class="t"><span>三个最常见的误解</span></div>
+  <div class="card">
+    <div class="row">
+      <div class="ico">👨‍👩‍👧</div>
+      <div class="info">
+        <div class="lab">第三类 · 家人</div>
+        <div class="name">最先能帮你把钱拦住的人</div>
+        <div class="addr">很多止损流程需要家人配合止损、陪同报案。<b>被骗不是蠢，对方是职业化的。</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="t rv d5"><span>三个最常见的误解</span></div>
   <div class="myth">
     <div class="mi">
       <div class="bad">✕ 要等金额够立案标准才能报案</div>
       <div class="good"><b>✓</b> 不用。直接去派出所说明情况就会受理，够不够立案是警方判断的事。</div>
     </div>
     <div class="mi">
-      <div class="bad">✕ 几百块钱报案没用</div>
-      <div class="good"><b>✓</b> 多起案件会合并计算案值。你这几百块，可能是同一个团伙几十起案件里的一环。</div>
+      <div class="bad">✕ 必须回学校那边的派出所</div>
+      <div class="good"><b>✓</b> 电诈案件任何派出所都受理。<b>就近、最快到达的那个就行</b>，省下的是止损时间。</div>
     </div>
     <div class="mi">
       <div class="bad">✕ 报案就是走个流程</div>
@@ -327,8 +263,8 @@
 
   <div class="foot">
     <div class="hr"></div>
-    内蒙古师范大学 · 反诈小安 校园反诈服务台<br>
-    本页面信息来自学校官方公开渠道，以学校最新通知为准
+    内蒙古自治区 · 校园反诈服务台<br>
+    派出所信息来自公开渠道，如有变动请以公安机关最新公布为准
   </div>
 </div>
 
@@ -336,51 +272,130 @@
 <button class="pgt off" id="pBgmBtn" aria-label="音乐开关">♪</button>
 
 <script>
+var DATA = {
+"saihan":[["大学西路派出所","学校北门斜对面，步行约 5 分钟","0471-4964903"]],
+"xincheng":[
+["西街派出所","新城区财神庙街 15 号","0471-6264299"],
+["新城东街派出所","新城区老缸房街 15 号","0471-6931935"],
+["海拉尔东路派出所","新城区团校巷 81 号","0471-6520505"],
+["迎新路派出所","新城区迎新东路团结公园南 100 米","0471-4662795"],
+["东风路派出所","新城区北垣东街 272 号","0471-2308114"],
+["锡林郭勒北路派出所","新城区锡林北路塞北关街中段","0471-3952509"],
+["保合少派出所","新城区 101 省道东 50 米","0471-6372057"],
+["城北派出所","新城区岱州营村委会对面","0471-4930680"],
+["丁香北路派出所","新城区成吉思汗公园一号小区北区","0471-3609568"],
+["万通路派出所","新城区塔利西路青城碧苑西门","0471-3685082"],
+["新华东街派出所","新城区 035 县道与万通路辅路交叉口西 60 米","0471-3901857"],
+["呼伦贝尔北路派出所","新城区呼伦贝尔北路与成吉思汗大街交叉口西北 460 米","0471-3698161"],
+["东河派出所","新城区知行路","0471-3686993"]],
+"huimin":[
+["攸攸板派出所","回民区攸攸板镇成吉思汗西街","0471-3307145"],
+["通道街派出所","回民区城隍庙街 4 号","0471-6307769"],
+["环河街派出所","回民区新华西街","0471-3901773"],
+["中山西路派出所","回民区中山西路国际贸易大厦一楼","0471-3690166"],
+["光明路派出所","回民区新华西街","0471-3964549"],
+["钢铁路派出所","回民区呼钢东路与民建巷交叉口","0471-5266233"],
+["新华西街派出所","回民区东洪桥街","0471-6298396"],
+["阿拉善北路派出所","回民区巴彦树贵街","0471-3913929"],
+["海拉尔西路派出所","回民区海拉尔西路虹云巷","0471-3815279"]],
+"yuquan":[
+["石东路派出所","玉泉区五塔寺东街看守所西巷南口","0471-5962985"],
+["大南街派出所","玉泉区大南街与玉泉一巷交叉口东南 100 米","0471-6307720"],
+["昭君路派出所","玉泉区玉泉路与包头大街交叉口西 120 米","0471-5901134"],
+["小黑河派出所","玉泉区巴彦淖尔南路","0471-5303689"],
+["鄂尔多斯路派出所","玉泉区南二环路前八里庄村委会院内一层","0471-6601794"],
+["西菜园派出所","玉泉区云中路 26 号","0471-5958790"],
+["兴隆巷派出所","玉泉区大玉石巷 54 号","0471-5982245"],
+["裕隆派出所","玉泉区南二环高架路与巴彦淖尔快速路交叉口东北角","0471-5685989"],
+["小召前街派出所","玉泉区小召前街与小召头道巷交汇处东 50 米","0471-5196593"]]
+};
+
 (function(){
-  // 粒子背景
-  var cv = document.getElementById('bg');
-  if (cv){
-    var ctx = cv.getContext('2d'), W, H, pts = [], dpr = Math.min(2, devicePixelRatio || 1);
-    function size(){ W = cv.width = innerWidth*dpr; H = cv.height = innerHeight*dpr;
-      cv.style.width = innerWidth+'px'; cv.style.height = innerHeight+'px'; }
-    size(); addEventListener('resize', size);
-    var N = Math.min(38, Math.round(innerWidth/30));
-    for (var i=0;i<N;i++) pts.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*0.0004,vy:(Math.random()-.5)*0.0004});
-    (function draw(){
-      ctx.clearRect(0,0,W,H);
-      var P = pts.map(function(p){ return {x:p.x*W,y:p.y*H}; });
-      var lim = 140*dpr;
-      for (var i=0;i<P.length;i++) for (var j=i+1;j<P.length;j++){
-        var dx=P[i].x-P[j].x, dy=P[i].y-P[j].y, d=Math.hypot(dx,dy);
-        if (d<lim){ ctx.strokeStyle='rgba(255,120,120,'+(0.14*(1-d/lim)).toFixed(3)+')';
-          ctx.lineWidth=dpr; ctx.beginPath(); ctx.moveTo(P[i].x,P[i].y); ctx.lineTo(P[j].x,P[j].y); ctx.stroke(); }
-      }
-      P.forEach(function(p){ ctx.fillStyle='rgba(255,150,150,.45)'; ctx.beginPath(); ctx.arc(p.x,p.y,1.6*dpr,0,7); ctx.fill(); });
-      pts.forEach(function(p){ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>1)p.vx*=-1; if(p.y<0||p.y>1)p.vy*=-1; });
-      requestAnimationFrame(draw);
-    })();
+  var cur = 'saihan';
+  var listEl = document.getElementById('list');
+  var qEl = document.getElementById('q');
+  var searchWrap = document.getElementById('searchWrap');
+  var list2 = document.getElementById('list2');
+  var QIXIAN = [["盛乐派出所","和林格尔县 · 学校东门正南约 90 米","0471-7390280"]];
+  var qixian = document.getElementById('qixian');
+
+  function render(){
+    var q = (qEl.value || '').trim();
+    var arr = DATA[cur] || [];
+    if (q) arr = arr.filter(function(x){ return (x[0] + x[1]).indexOf(q) >= 0; });
+    if (!arr.length){ listEl.innerHTML = '<div class="empty">没搜到，换个关键词试试</div>'; return; }
+    var h = '';
+    arr.forEach(function(x, i){
+      h += '<a class="ps" href="tel:' + x[2].replace(/-/g, '') + '" style="animation-delay:' + (i * 0.03) + 's">' +
+           '<div class="top"><span class="nm">' + x[0] + '</span><span class="tel">' + x[2] + '</span></div>' +
+           '<div class="ad">' + x[1] + '</div></a>';
+    });
+    listEl.innerHTML = h;
   }
 
-  // 校区切换
+  function switchTo(c){
+    cur = c;
+    if (c === 'qixian'){
+      listEl.innerHTML = ''; listEl.classList.add('hide');
+      searchWrap.classList.add('hide');
+      qixian.classList.remove('hide');
+      if (list2){
+        list2.innerHTML = QIXIAN.map(function(x, i){
+          return '<a class="ps" href="tel:' + x[2].replace(/-/g,'') + '" style="animation-delay:' + (i*0.03) + 's">' +
+                 '<div class="top"><span class="nm">' + x[0] + '</span><span class="tel">' + x[2] + '</span></div>' +
+                 '<div class="ad">' + x[1] + '</div></a>';
+        }).join('');
+      }
+      return;
+    }
+    listEl.classList.remove('hide');
+    searchWrap.classList.remove('hide');
+    qixian.classList.add('hide');
+    render();
+  }
+
   document.querySelectorAll('.tab').forEach(function(t){
     t.addEventListener('click', function(){
       document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('on'); });
       t.classList.add('on');
-      var c = t.dataset.campus;
-      document.getElementById('saihan').classList.toggle('hide', c !== 'saihan');
-      document.getElementById('shengle').classList.toggle('hide', c !== 'shengle');
+      qEl.value = '';
+      switchTo(t.dataset.c);
     });
   });
+  qEl.addEventListener('input', render);
+  switchTo('saihan');
 
-  // 音乐
+  var cv = document.getElementById('bg');
+  if (cv){
+    var ctx = cv.getContext('2d'), W, H, pts = [], dpr = Math.min(2, devicePixelRatio || 1);
+    function size(){ W = cv.width = innerWidth * dpr; H = cv.height = innerHeight * dpr;
+      cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px'; }
+    size(); addEventListener('resize', size);
+    var N = Math.min(36, Math.round(innerWidth / 32));
+    for (var i = 0; i < N; i++) pts.push({x: Math.random(), y: Math.random(), vx: (Math.random() - .5) * 0.0004, vy: (Math.random() - .5) * 0.0004});
+    (function draw(){
+      ctx.clearRect(0, 0, W, H);
+      var P = pts.map(function(p){ return {x: p.x * W, y: p.y * H}; });
+      var lim = 140 * dpr;
+      for (var i = 0; i < P.length; i++) for (var j = i + 1; j < P.length; j++){
+        var dx = P[i].x - P[j].x, dy = P[i].y - P[j].y, d = Math.hypot(dx, dy);
+        if (d < lim){ ctx.strokeStyle = 'rgba(255,120,120,' + (0.13 * (1 - d / lim)).toFixed(3) + ')';
+          ctx.lineWidth = dpr; ctx.beginPath(); ctx.moveTo(P[i].x, P[i].y); ctx.lineTo(P[j].x, P[j].y); ctx.stroke(); }
+      }
+      P.forEach(function(p){ ctx.fillStyle = 'rgba(255,150,150,.4)'; ctx.beginPath(); ctx.arc(p.x, p.y, 1.5 * dpr, 0, 7); ctx.fill(); });
+      pts.forEach(function(p){ p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > 1) p.vx *= -1; if (p.y < 0 || p.y > 1) p.vy *= -1; });
+      requestAnimationFrame(draw);
+    })();
+  }
+
   var a = document.getElementById('pBgm'), b = document.getElementById('pBgmBtn');
   if (a && b){
     a.volume = 0.34;
     function ui(){ b.classList.toggle('off', a.paused); }
     function start(){ a.play().then(ui).catch(ui); }
     start();
-    document.addEventListener('pointerdown', function once(){ if(a.paused) start(); document.removeEventListener('pointerdown', once); }, {passive:true});
-    b.addEventListener('click', function(e){ e.stopPropagation(); if(a.paused) start(); else { a.pause(); ui(); } });
+    document.addEventListener('pointerdown', function once(){ if (a.paused) start(); document.removeEventListener('pointerdown', once); }, {passive: true});
+    b.addEventListener('click', function(e){ e.stopPropagation(); if (a.paused) start(); else { a.pause(); ui(); } });
     a.addEventListener('play', ui); a.addEventListener('pause', ui); ui();
   }
 })();

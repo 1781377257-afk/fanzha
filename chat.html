@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>反诈小安 · 对话</title>
+<title>反诈小安 · 正在接通</title>
 <style>
   :root{
     --bg1:#f7fbff;--bg2:#e8f1fb;--txt:#1a2740;--sub:#64748b;
@@ -36,40 +36,47 @@
     padding:6px 10px;border-radius:9px;background:rgba(26,111,212,.08);
   }
 
-  main{flex:1 1 auto;position:relative;overflow:hidden}
-  #bot{width:100%;height:100%}
-  #bot iframe{width:100%!important;height:100%!important;border:0}
+  main{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+       gap:12px;padding:24px 18px;position:relative}
 
-  /* 加载中 */
-  .loading{
-    position:absolute;inset:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:14px;color:var(--sub);
-    font-size:12.5px;pointer-events:none;transition:opacity .4s;
+  .avatar{
+    width:64px;height:64px;border-radius:50%;flex:0 0 auto;
+    background:linear-gradient(140deg,#37b6ff,#1a6fd4);
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:26px;
+    box-shadow:0 14px 34px rgba(26,111,212,.30);
+    animation:breathe 2.4s ease-in-out infinite;
   }
-  .spin{
-    width:26px;height:26px;border-radius:50%;
-    border:2.5px solid rgba(26,111,212,.18);border-top-color:var(--brand);
-    animation:spin .8s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading.gone{opacity:0}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 
-  /* 兜底 */
-  .fallback{
-    position:absolute;inset:0;display:none;flex-direction:column;
-    align-items:center;justify-content:center;gap:16px;padding:28px;text-align:center;
+  .name{font-size:13px;font-weight:700;letter-spacing:.5px;color:#20406e}
+  .state{font-size:11.5px;color:var(--sub);display:flex;align-items:center;gap:6px}
+  .dot{width:6px;height:6px;border-radius:50%;background:#2fd39a;animation:blink 1.2s infinite}
+  @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+  .chatwrap{width:100%;max-width:340px;display:flex;flex-direction:column;gap:9px;margin-top:6px}
+  .bub{
+    max-width:80%;padding:10px 13px;border-radius:14px;font-size:12.5px;line-height:1.7;
+    background:#fff;border:1px solid rgba(26,60,110,.08);
+    box-shadow:0 6px 18px rgba(20,50,90,.06);
+    opacity:0;transform:translateY(8px) scale(.96);
+    animation:pop .34s cubic-bezier(.2,.9,.3,1) forwards;
   }
-  .fallback.on{display:flex}
-  .fallback .em{font-size:30px}
-  .fallback h2{font-size:16px;font-weight:700}
-  .fallback p{font-size:12.5px;color:var(--sub);line-height:1.8;max-width:290px}
-  .fallback a{
-    display:inline-block;padding:13px 26px;border-radius:13px;text-decoration:none;
+  .bub.me{
+    align-self:flex-end;background:linear-gradient(140deg,#37b6ff,#1a6fd4);
+    color:#fff;border-color:transparent;
+  }
+  .bub.you{align-self:flex-start}
+  @keyframes pop{to{opacity:1;transform:none}}
+
+  .hint{margin-top:14px;font-size:11.5px;color:#94a3b8;letter-spacing:.5px}
+  .fail{display:none;flex-direction:column;align-items:center;gap:12px;margin-top:16px}
+  .fail.on{display:flex}
+  .fail a{
+    display:inline-block;padding:12px 24px;border-radius:13px;text-decoration:none;
     background:linear-gradient(140deg,#37b6ff,#1a6fd4);color:#fff;
-    font-size:14.5px;font-weight:700;letter-spacing:.5px;
+    font-size:14px;font-weight:700;letter-spacing:.5px;
     box-shadow:0 12px 28px rgba(26,111,212,.28);
   }
-  .tip{margin-top:6px;font-size:11px;color:#94a3b8}
 </style>
 </head>
 <body>
@@ -78,74 +85,70 @@
   <div class="logo">安</div>
   <div>
     <h1>反诈小安</h1>
-    <p>内蒙古师范大学 · 校园反诈服务台</p>
+    <p>内蒙古自治区 · 校园反诈服务台</p>
   </div>
   <a class="back" href="index.html">返回</a>
 </header>
 
 <main>
-  <div id="bot"></div>
+  <div class="avatar">安</div>
+  <div class="name">反诈小安</div>
+  <div class="state"><span class="dot"></span><span id="stateTxt">正在接通…</span></div>
 
-  <div class="loading" id="loading">
-    <div class="spin"></div>
-    <div>正在连接小安…</div>
+  <div class="chatwrap">
+    <div class="bub you">在吗？我想练一次。</div>
+    <div class="bub me" id="b2">在的。说「练一下」，我扮骗子，你试着识破我。</div>
   </div>
 
-  <div class="fallback" id="fallback">
-    <div class="em">🔌</div>
-    <h2>对话窗口没加载出来</h2>
-    <p>可能是网络或浏览器限制。直接点下面按钮，在新的页面和小安对话。</p>
+  <div class="hint" id="hint">正在打开对话窗口…</div>
+
+  <div class="fail" id="fail">
+    <div class="hint">窗口没有自动打开，点下面按钮进入。</div>
     <a id="jump" href="#">进入对话 →</a>
-    <div class="tip">功能完全一样</div>
   </div>
 </main>
 
-<!-- 超星智能体 Web SDK -->
-<script type="text/javascript" src="https://robot.chaoxing.com/sdk/CxRobotSdk.js"></script>
+<audio id="ding" src="audio/ding.wav" preload="auto"></audio>
+
 <script type="text/javascript">
 (function(){
-  var EMBED = 'https://robot.chaoxing.com/embedChat?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae&groupId=0&openType=openUrl&openPage=coze';
-  var KEY   = '2ac7e2cdb92ee45dc442d13cc3a840e7';
-  var FULL  = 'https://robot.chaoxing.com/prime?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae';
+  var COZE = "https://robot.chaoxing.com/coze?unitId=353067&robotId=6a2a1689c92a4e49be27b47a640538ae";
+  var ding = document.getElementById('ding');
+  var b2 = document.getElementById('b2');
+  var jump = document.getElementById('jump');
+  var fail = document.getElementById('fail');
+  var hint = document.getElementById('hint');
+  var stateTxt = document.getElementById('stateTxt');
+  if (jump) jump.href = COZE;
 
-  var loading = document.getElementById('loading');
-  var fallback = document.getElementById('fallback');
-  document.getElementById('jump').href = FULL;
-
-  var ok = false;
-
-  function fail(){
-    if (ok) return;
-    loading.classList.add('gone');
-    fallback.classList.add('on');
+  function playDing(){
+    if (!ding) return;
+    try { ding.currentTime = 0; ding.volume = 0.55; ding.play().catch(function(){}); } catch(e){}
   }
 
-  try{
-    if (window.CxRobotSdk && CxRobotSdk.js && typeof CxRobotSdk.js.init === 'function'){
-      CxRobotSdk.js.init(EMBED, KEY);
-      ok = true;
-      setTimeout(function(){ loading.classList.add('gone'); }, 1200);
-      // 再检查一次是否真的渲染出了 iframe
-      setTimeout(function(){
-        var el = document.getElementById('bot');
-        if (!el.querySelector('iframe')){
-          ok = false;
-          fail();
-        }
-      }, 6000);
-    } else {
-      setTimeout(fail, 600);
-    }
-  } catch(e){
-    setTimeout(fail, 300);
-  }
+  if (b2) b2.style.animationDelay = '0.55s';
 
-  // SDK 脚本本身加载失败
-  window.addEventListener('error', function(ev){
-    if (ev && ev.target && ev.target.tagName === 'SCRIPT') fail();
-  }, true);
+  // 两条消息各响一次
+  setTimeout(playDing, 240);
+  setTimeout(playDing, 820);
+  setTimeout(function(){ if (stateTxt) stateTxt.textContent = '即将进入对话…'; }, 1100);
 
-  setTimeout(fail, 9000);
+  // 自动播放被拦时，用户点一下也能出声
+  document.addEventListener('pointerdown', function once(){
+    playDing();
+    document.removeEventListener('pointerdown', once);
+  }, {passive:true});
+
+  // 1.7 秒后跳转
+  setTimeout(function(){
+    try { window.location.replace(COZE); } catch(e){}
+  }, 1700);
+
+  // 4.5 秒还没跳走 → 给按钮
+  setTimeout(function(){
+    if (hint) hint.style.display = 'none';
+    if (fail) fail.classList.add('on');
+  }, 4500);
 })();
 </script>
 </body>
