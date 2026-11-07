@@ -783,6 +783,15 @@
     .fab .ft{font-size:11.5px}
   }
 
+
+  .vload{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;
+    font-size:12px;color:#cfe6ff;letter-spacing:1px;padding:10px 16px;border-radius:999px;
+    background:rgba(6,12,22,.82);border:1px solid rgba(120,180,255,.3);
+    display:none;pointer-events:none;white-space:nowrap;
+  }
+  .vload.on{display:block}
+
 </style>
 </head>
 <body>
@@ -1192,6 +1201,7 @@
   <div class="vbox">
     <button class="vclose" id="vclose">✕</button>
     <video id="vplayer" controls playsinline preload="none"></video>
+    <div class="vload" id="vload">视频加载中 · 网络较慢时请稍候</div>
     <div class="vt" id="vtitle"></div>
   </div>
 </div>
@@ -1507,6 +1517,11 @@
   var vplayer = document.getElementById('vplayer');
   var vtitle = document.getElementById('vtitle');
   var bgmWasPlaying = false;
+  var vload = document.getElementById('vload');
+  vplayer.addEventListener('waiting', function(){ if (vload) vload.classList.add('on'); });
+  vplayer.addEventListener('playing', function(){ if (vload) vload.classList.remove('on'); });
+  vplayer.addEventListener('canplay', function(){ if (vload) vload.classList.remove('on'); });
+  vplayer.addEventListener('error', function(){ if (vload){ vload.textContent = '视频加载失败，请刷新后重试'; vload.classList.add('on'); } });
 
   document.querySelectorAll('.vd').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -1526,12 +1541,14 @@
       };
       vplayer.src = src;
       vmodal.classList.add('on');
+      if (vload){ vload.textContent = '视频加载中 · 网络较慢时请稍候'; vload.classList.add('on'); }
       vplayer.play().catch(function(){});
     });
   });
 
   function closeV(){
     vmodal.classList.remove('on');
+    if (vload) vload.classList.remove('on');
     vplayer.pause();
     vplayer.removeAttribute('src');
     vplayer.load();

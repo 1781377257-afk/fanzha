@@ -170,7 +170,7 @@
 </style>
 </head>
 <body>
-<audio id="gBgm" src="audio/game_bgm.mp3" loop preload="none"></audio>
+<audio id="gBgm" src="audio/game_bgm.mp3" loop preload="auto"></audio>
 <audio id="gWin" src="audio/win.mp3" preload="none"></audio>
 <audio id="gLose" src="audio/lose.mp3" preload="none"></audio>
 <div class="wrap">
@@ -234,6 +234,7 @@
   });
   function bgmStart(){
     if (!gBgm) return;
+    try { gBgm.load(); } catch(e){}
     gBgm.volume = 0.26;
     gBgm.currentTime = 0;
     gBgm.play().catch(function(){});
